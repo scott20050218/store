@@ -3,7 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
 from app.config import settings
-from app.routers import auth, inbound, outbound, inventory, user, config, upload
+from app.routers import auth, inbound, outbound, inventory, user, config, upload, wechat
 
 # Create uploads directory
 Path(settings.upload_dir).mkdir(parents=True, exist_ok=True)
@@ -25,6 +25,7 @@ app.include_router(inventory.router, prefix="/api/inventory", tags=["inventory"]
 app.include_router(user.router, prefix="/api/user", tags=["user"])
 app.include_router(config.router, prefix="/api", tags=["config"])
 app.include_router(upload.router, prefix="/api", tags=["upload"])
+app.include_router(wechat.router, prefix="/api/wechat", tags=["wechat"])
 
 
 @app.get("/health")

@@ -16,7 +16,9 @@ def outbound(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    success, message = outbound_fifo(db, data.itemType, data.quantity)
+    success, message = outbound_fifo(
+        db, current_user.id, data.itemType, data.quantity, data.outboundDate
+    )
     if success:
         return {"success": True}
     return {"success": False, "message": message}

@@ -63,10 +63,14 @@
   border-bottom: 1rpx solid #eee;
 }
 
-.edit-btn {
-  font-size: 28rpx;
-  font-weight: normal;
-  color: #6462cc;
+.save-passcode-btn {
+  margin-top: 24rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  font-size: 30rpx;
+  background: linear-gradient(135deg, #6462cc 0%, #5ec9db 100%);
+  color: #fff;
+  border-radius: 12rpx;
 }
 
 .info-item {

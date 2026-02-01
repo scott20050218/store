@@ -1,26 +1,26 @@
-<!--pages/overview/overview.wxml 物品总览-->
+<!--pages/overview/overview.wxml 物品总览：物品+标签+位置+数量+入库时间+到期日期，临近到期告警，有照片可点击查看-->
 <navigation-bar title="物品总览" back="{{true}}" color="black" background="#FFF"></navigation-bar>
 <scroll-view class="scrollarea" scroll-y type="list" refresher-enabled="{{true}}" bindrefresherrefresh="onPullDownRefresh">
   <view class="container">
     <view class="list" wx:if="{{list.length > 0}}">
-      <view class="item" wx:for="{{list}}" wx:key="id">
+      <view class="item {{item.expiryWarning ? 'item-warning' : ''}}" wx:for="{{list}}" wx:key="id">
         <view class="item-left">
-          <view class="item-icon-box">
-            <text class="item-icon-box-inner">📦</text>
+          <view class="row-name-wrap">
+            <text class="row-name">{{item.itemType}}</text>
+            <text class="row-location" wx:if="{{item.location}}">位置：{{item.location}}</text>
+            <view class="row-tag" wx:if="{{item.tag}}" style="background-color: {{item.tag}}"></view>
           </view>
-          <view class="item-info">
-            <text class="item-name">{{item.itemType}}</text>
-            <text class="item-qty">X{{item.quantity}}</text>
+          <view class="row-meta">
+            <text class="row-meta-item">入库：{{item.inboundDate || '无'}}</text>
+            <text class="row-meta-item">到期：{{item.expiryDate || '无'}}</text>
+          </view>
+          <view class="row-photo" wx:if="{{item.photoUrl}}">
+            <text class="photo-link" data-url="{{item.photoUrl}}" bindtap="onPreviewPhoto">查看照片</text>
           </view>
         </view>
         <view class="item-right">
-          <text class="item-remaining-label">剩余</text>
-          <text class="item-days {{item.daysRemaining <= 7 ? 'warning' : ''}}">{{item.daysRemaining}}天</text>
-          <view class="progress-wrap">
-            <view class="progress-bar">
-              <view class="progress-fill" style="width: {{item.progressPercent}}%"></view>
-            </view>
-          </view>
+          <text class="row-qty">×{{item.quantity}}</text>
+          <text class="row-alarm" wx:if="{{item.expiryWarning}}">即将过期</text>
         </view>
       </view>
     </view>

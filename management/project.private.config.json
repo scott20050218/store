@@ -1,6 +1,8 @@
 {
   "projectname": "management",
   "setting": {
-    "compileHotReLoad": true
-  }
+    "compileHotReLoad": true,
+    "urlCheck": false
+  },
+  "libVersion": "3.12.1"
 }

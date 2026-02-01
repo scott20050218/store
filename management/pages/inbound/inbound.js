@@ -1,17 +1,59 @@
 // pages/inbound/inbound.js
 const storage = require("../../utils/storage");
+const api = require("../../utils/api");
 
-// 到期日期选项：物品多长时间后过期（1个月、3个月）
-const EXPIRY_OPTIONS = [
-  { label: "1个月", months: 1 },
-  { label: "3个月", months: 3 },
-];
+// 到期日期选项：从后端 config.expiry 解析，逗号分隔，单位为月（如 "1,3,6" 或 [1,3,6]）
+function parseExpiryMonths(expiry) {
+  if (Array.isArray(expiry)) {
+    return expiry
+      .map((n) => Number(n))
+      .filter((n) => !Number.isNaN(n) && n > 0);
+  }
+  if (typeof expiry === "string") {
+    return expiry
+      .split(",")
+      .map((s) => Number(s.trim()))
+      .filter((n) => !Number.isNaN(n) && n > 0);
+  }
+  return [1, 3, 6];
+}
 
-// 到期提醒选项：还有多少天过期时提醒用户（3天、7天）
-const REMINDER_OPTIONS = [
-  { label: "3天", days: 3 },
-  { label: "7天", days: 7 },
-];
+function buildExpiryFromConfig(config) {
+  const months = parseExpiryMonths(config && config.expiry);
+  const arr = months.length ? months : [1, 3, 6];
+  return {
+    expiryOptions: arr.map((m) => `${m}个月`),
+    expiryMonths: arr,
+  };
+}
+
+// 到期提醒选项：从后端 config.expiryWarningDays 解析，逗号分隔，单位为天（如 "3,7" 或 [3,7]）
+function parseReminderDays(expiryWarningDays) {
+  if (Array.isArray(expiryWarningDays)) {
+    return expiryWarningDays
+      .map((n) => Number(n))
+      .filter((n) => !Number.isNaN(n) && n > 0);
+  }
+  if (typeof expiryWarningDays === "string") {
+    return expiryWarningDays
+      .split(",")
+      .map((s) => Number(s.trim()))
+      .filter((n) => !Number.isNaN(n) && n > 0);
+  }
+  if (typeof expiryWarningDays === "number" && expiryWarningDays > 0) {
+    return [expiryWarningDays];
+  }
+  return [3, 7];
+}
+
+function buildReminderFromConfig(config) {
+  const days = parseReminderDays(config && config.expiryWarningDays);
+  const arr = days.length ? days : [3, 7];
+  return {
+    reminderOptions: arr.map((d) => `${d}天`),
+    reminderDays: arr,
+  };
+}
 
 // 位置选项
 const LOCATION_OPTIONS = [
@@ -63,8 +105,10 @@ Page({
     typeIndex: 0,
     customType: "",
     showCustomInput: false,
-    expiryOptions: EXPIRY_OPTIONS.map((o) => o.label),
-    reminderOptions: REMINDER_OPTIONS.map((o) => o.label),
+    expiryOptions: ["1个月", "3个月"],
+    expiryMonths: [1, 3],
+    reminderOptions: ["3天", "7天"],
+    reminderDays: [3, 7],
     expiryIndex: 0,
     productionDate: "",
     quantity: "",
@@ -80,6 +124,32 @@ Page({
       dateTimeColumns: buildDateTimeColumns(),
     });
     this.setLocalDateTime();
+    api
+      .getConfig()
+      .then((config) => {
+        const types = (config && config.itemTypes) || storage.ITEM_TYPES;
+        const list = Array.isArray(types)
+          ? types
+          : typeof types === "string"
+          ? types.split(",").map((s) => s.trim())
+          : storage.ITEM_TYPES;
+        const expiry = buildExpiryFromConfig(config);
+        const reminder = buildReminderFromConfig(config);
+        this.setData({
+          itemTypes: [...list, "自定义"],
+          ...expiry,
+          ...reminder,
+        });
+      })
+      .catch(() => {
+        this.setData({
+          itemTypes: [...storage.ITEM_TYPES, "自定义"],
+          expiryOptions: ["1个月", "3个月"],
+          expiryMonths: [1, 3],
+          reminderOptions: ["3天", "7天"],
+          reminderDays: [3, 7],
+        });
+      });
   },
 
   onShow() {
@@ -263,32 +333,91 @@ Page({
       wx.showToast({ title: "数量必须为正整数", icon: "none" });
       return;
     }
+    console.log(tagIndex);
+    if (tagIndex == -1) {
+      wx.showToast({ title: "请选择标签颜色", icon: "none" });
+      return;
+    }
 
     const inboundDate = new Date(inboundDateTime.replace(/-/g, "/"));
     const inboundDateStr = inboundDateTime.slice(0, 10); // YYYY-MM-DD
-    const expiryOpt = EXPIRY_OPTIONS[expiryIndex];
+    const expiryMonths = this.data.expiryMonths || [1, 3];
+    const months =
+      expiryMonths[expiryIndex] != null
+        ? expiryMonths[expiryIndex]
+        : expiryMonths[0];
     const expiryDate = new Date(inboundDate);
-    expiryDate.setMonth(expiryDate.getMonth() + expiryOpt.months);
+    expiryDate.setMonth(expiryDate.getMonth() + months);
     const expiryDateStr = storage.formatDate(expiryDate);
 
-    const reminderDays = REMINDER_OPTIONS[reminderIndex].days;
-    const success = storage.addInbound({
+    const body = {
       itemType,
       quantity: numQty,
       expiryDate: expiryDateStr,
       inboundDate: inboundDateStr,
-      reminderDays,
       productionDate: productionDate || "",
       tag: tagIndex >= 0 ? tagColors[tagIndex] : "",
       location: locationIndex > 0 ? locationOptions[locationIndex] : "",
-      photo: photoPath || "",
-    });
+      photo: "",
+    };
 
-    if (success) {
-      wx.showToast({ title: "入库成功", icon: "success", duration: 1500 });
-      setTimeout(() => this.resetForm(), 1500);
+    const doPost = (photoUrl) => {
+      body.photo = photoUrl || "";
+      api
+        .postInbound(body)
+        .then((res) => {
+          if (res.success) {
+            wx.showToast({
+              title: "入库成功",
+              icon: "success",
+              duration: 1500,
+            });
+            api
+              .getConfig()
+              .then((config) => {
+                const types =
+                  (config && config.itemTypes) || storage.ITEM_TYPES;
+                const list = Array.isArray(types)
+                  ? types
+                  : typeof types === "string"
+                  ? types.split(",").map((s) => s.trim())
+                  : storage.ITEM_TYPES;
+                const expiry = buildExpiryFromConfig(config);
+                const reminder = buildReminderFromConfig(config);
+                this.setData({
+                  itemTypes: [...list, "自定义"],
+                  ...expiry,
+                  ...reminder,
+                });
+              })
+              .catch(() => {});
+            setTimeout(() => this.resetForm(), 1500);
+            wx.switchTab({ url: "/pages/index/index" });
+          } else {
+            wx.showToast({ title: res.message || "入库失败", icon: "none" });
+          }
+        })
+        .catch((e) => {
+          if (e.message === "未登录或登录已过期")
+            wx.reLaunch({ url: "/pages/login/login" });
+          else wx.showToast({ title: e.message || "入库失败", icon: "none" });
+        });
+    };
+
+    if (photoPath) {
+      wx.showLoading({ title: "上传中..." });
+      api
+        .uploadImage(photoPath)
+        .then((url) => {
+          wx.hideLoading();
+          doPost(url);
+        })
+        .catch((e) => {
+          wx.hideLoading();
+          wx.showToast({ title: e.message || "图片上传失败", icon: "none" });
+        });
     } else {
-      wx.showToast({ title: "入库失败", icon: "error" });
+      doPost("");
     }
   },
 

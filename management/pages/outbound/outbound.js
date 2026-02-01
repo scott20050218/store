@@ -1,5 +1,6 @@
 // pages/outbound/outbound.js
 const storage = require("../../utils/storage");
+const api = require("../../utils/api");
 
 Page({
   data: {
@@ -18,8 +19,14 @@ Page({
   },
 
   loadList() {
-    const list = storage.getOutboundItemList();
-    this.setData({ list });
+    api
+      .getOutboundList()
+      .then((list) => this.setData({ list: list || [] }))
+      .catch((e) => {
+        if (e.message === "未登录或登录已过期")
+          wx.reLaunch({ url: "/pages/login/login" });
+        else wx.showToast({ title: e.message || "加载失败", icon: "none" });
+      });
   },
 
   // 点击出库按钮（左滑后露出的按钮）
@@ -73,19 +80,31 @@ Page({
       });
       return;
     }
-    const date = storage.formatDate(new Date());
-    const result = storage.addOutbound(outboundItem.itemType, qty, date);
-    if (result.success) {
-      wx.showToast({ title: "出库成功", icon: "success" });
-      // 关闭弹窗并刷新出库列表
-      this.setData({
-        showQuantityModal: false,
-        outboundItem: null,
-        outboundQuantity: "",
-        list: storage.getOutboundItemList(),
+    const outboundDate = storage.formatDate(new Date());
+    api
+      .postOutbound({
+        itemType: outboundItem.itemType,
+        quantity: qty,
+        outboundDate,
+      })
+      .then((res) => {
+        if (res.success) {
+          wx.showToast({ title: "出库成功", icon: "success" });
+          this.setData({
+            showQuantityModal: false,
+            outboundItem: null,
+            outboundQuantity: "",
+          });
+          this.loadList();
+          wx.switchTab({ url: "/pages/index/index" });
+        } else {
+          wx.showToast({ title: res.message || "出库失败", icon: "none" });
+        }
+      })
+      .catch((e) => {
+        if (e.message === "未登录或登录已过期")
+          wx.reLaunch({ url: "/pages/login/login" });
+        else wx.showToast({ title: e.message || "出库失败", icon: "none" });
       });
-    } else {
-      wx.showToast({ title: result.message, icon: "none" });
-    }
   },
 });

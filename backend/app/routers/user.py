@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 
 from app.core.auth import get_current_user
 from app.models.user import User
-from app.schemas.user import UserInfoUpdate
+from app.schemas.user import UserInfoUpdate, PasscodeUpdate
 from app.database import get_db
 from sqlalchemy.orm import Session
 
@@ -37,5 +37,16 @@ def update_user_info(
         current_user.name = data.name
     if data.phone is not None and current_user.status != "已注册":
         current_user.phone = data.phone
+    db.commit()
+    return {"success": True}
+
+
+@router.put("/passcode")
+def update_passcode(
+    data: PasscodeUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    current_user.passcode = data.passcode
     db.commit()
     return {"success": True}

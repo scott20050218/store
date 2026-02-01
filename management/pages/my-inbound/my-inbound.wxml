@@ -1,0 +1,24 @@
+<!--pages/my-inbound/my-inbound.wxml-->
+<navigation-bar title="我的入库" back="{{true}}" color="black" background="#FFF"></navigation-bar>
+<scroll-view class="scrollarea" scroll-y type="list" bindscrolltolower="onLoadMore" lower-threshold="100">
+  <view class="container">
+    <view class="list" wx:if="{{list.length > 0}}">
+      <view class="detail-row" style="{{item.tag ? 'border-left: 6rpx solid ' + item.tag : 'border-left: 6rpx solid #52c41a'}}" wx:for="{{list}}" wx:key="id">
+        <view class="detail-left">
+          <text class="detail-item">{{item.itemType}}</text>
+          <text class="detail-meta">入库：{{item.inboundDate}}</text>
+          <text class="detail-meta" wx:if="{{item.expiryDate}}">到期：{{item.expiryDate}}</text>
+          <text class="detail-meta" wx:if="{{item.location}}">货架：{{item.location}}</text>
+        </view>
+        <view class="detail-right">
+          <text class="detail-qty">{{item.quantity}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="loading" wx:if="{{loading}}">加载中...</view>
+    <view class="no-more" wx:if="{{!hasMore && list.length > 0}}">没有更多了</view>
+    <view class="empty-state" wx:if="{{!loading && list.length === 0}}">
+      <text class="empty-text">暂无入库记录</text>
+    </view>
+  </view>
+</scroll-view>

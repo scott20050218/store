@@ -1,6 +1,6 @@
 <!--pages/statistics/statistics.wxml-->
 <navigation-bar title="库存统计" back="{{true}}" backAsHome="{{true}}" color="black" background="#FFF"></navigation-bar>
-<scroll-view class="scrollarea" scroll-y type="list" refresher-enabled="{{true}}" bindrefresherrefresh="onPullDownRefresh">
+<scroll-view class="scrollarea" scroll-y scroll-into-view="{{scrollIntoView}}" type="list" refresher-enabled="{{true}}" bindrefresherrefresh="onPullDownRefresh">
   <view class="container">
     <!-- 告警概览 -->
     <view class="warning-overview" wx:if="{{hasWarnings}}">
@@ -17,9 +17,63 @@
       </view>
     </view>
 
-    <!-- 库存列表：名称+货架+标签+入库时间+到期时间+数量，小于过期提醒时间则告警 -->
-    <view class="section-title">库存明细</view>
-    <view class="stats-list" wx:if="{{list.length > 0}}">
+    <!-- 出入库统计：按时间段 -->
+    <view class="section-title">出入库统计</view>
+    <view class="io-stats-range">
+      <view class="range-item">
+        <text class="range-label">开始</text>
+        <picker mode="date" value="{{startDate}}" bindchange="onStartDateChange">
+          <view class="range-value">{{startDate}}</view>
+        </picker>
+      </view>
+      <view class="range-item">
+        <text class="range-label">结束</text>
+        <picker mode="date" value="{{endDate}}" bindchange="onEndDateChange">
+          <view class="range-value">{{endDate}}</view>
+        </picker>
+      </view>
+    </view>
+    <view class="io-stats-table" wx:if="{{ioStats.length > 0}}">
+      <view class="io-stats-header">
+        <text class="col-item">物品</text>
+        <text class="col-in">入库</text>
+        <text class="col-out">出库</text>
+        <text class="col-net">净变化</text>
+      </view>
+      <view class="io-stats-row" wx:for="{{ioStats}}" wx:key="itemType">
+        <view class="col-item clickable" data-item-type="{{item.itemType}}" data-mode="both" bindtap="onIODetailTap">{{item.itemType}}</view>
+        <view class="col-in clickable" data-item-type="{{item.itemType}}" data-mode="inbound" bindtap="onIODetailTap">{{item.inboundQty}}</view>
+        <view class="col-out clickable" data-item-type="{{item.itemType}}" data-mode="outbound" bindtap="onIODetailTap">{{item.outboundQty}}</view>
+        <text class="col-net {{item.netChange > 0 ? 'net-positive' : ''}} {{item.netChange < 0 ? 'net-negative' : ''}}">{{item.netChange}}</text>
+      </view>
+    </view>
+    <view class="io-stats-empty" wx:if="{{ioStats.length === 0}}">
+      <text class="io-stats-empty-text">该时间段内暂无出入库记录</text>
+    </view>
+
+    <!-- 库存明细：点击出入库统计时显示明细，否则显示库存列表 -->
+    <view class="section-title" id="detailSection">
+      {{detailMode ? detailTitle : '库存明细'}}
+      <text class="clear-detail" wx:if="{{detailMode}}" bindtap="onClearDetail">返回</text>
+    </view>
+    <view class="stats-list" wx:if="{{detailMode && detailList.length > 0}}">
+      <view class="detail-row {{item.tag ? '' : (item.type === 'inbound' ? 'detail-inbound' : 'detail-outbound')}}" style="{{item.tag ? 'border-left: 6rpx solid ' + item.tag : ''}}" wx:for="{{detailList}}" wx:key="index">
+        <view class="detail-left">
+          <text class="detail-type">{{item.type === 'inbound' ? '入库' : '出库'}}</text>
+          <text class="detail-date">{{item.date}}</text>
+          <text class="detail-user" wx:if="{{item.userName}}">操作人：{{item.userName}}</text>
+          <text class="detail-location" wx:if="{{item.location}}">货架：{{item.location}}</text>
+          <text class="detail-expiry" wx:if="{{item.expiryDate}}">到期：{{item.expiryDate}}</text>
+        </view>
+        <view class="detail-right">
+          <text class="detail-qty">{{item.quantity}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="empty-state" wx:elif="{{detailMode && detailList.length === 0}}">
+      <text class="empty-hint">该时间段内暂无记录</text>
+    </view>
+    <view class="stats-list" wx:elif="{{!detailMode && list.length > 0}}">
       <view class="stats-row {{item.expiryWarning ? 'row-expiry-alarm' : ''}}" wx:for="{{list}}" wx:key="id">
         <view class="row-left">
           <view class="row-name-wrap">
@@ -38,9 +92,7 @@
         </view>
       </view>
     </view>
-
-    <!-- 空状态 -->
-    <view class="empty-state" wx:if="{{list.length === 0}}">
+    <view class="empty-state" wx:elif="{{!detailMode && list.length === 0}}">
       <text class="empty-icon">📦</text>
       <text class="empty-text">暂无库存数据</text>
       <text class="empty-hint">请先进行入库操作</text>

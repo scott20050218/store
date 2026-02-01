@@ -16,9 +16,23 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
+def _passcode_column_exists(conn) -> bool:
+    result = conn.execute(
+        sa.text(
+            "SELECT COUNT(*) FROM information_schema.COLUMNS "
+            "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND COLUMN_NAME = 'passcode'"
+        )
+    )
+    return result.scalar() > 0
+
+
 def upgrade() -> None:
-    op.add_column("users", sa.Column("passcode", sa.String(64), nullable=True))
+    conn = op.get_bind()
+    if not _passcode_column_exists(conn):
+        op.add_column("users", sa.Column("passcode", sa.String(64), nullable=True))
 
 
 def downgrade() -> None:
-    op.drop_column("users", "passcode")
+    conn = op.get_bind()
+    if _passcode_column_exists(conn):
+        op.drop_column("users", "passcode")

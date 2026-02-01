@@ -1,11 +1,13 @@
 // pages/profile/profile.js
-const storage = require("../../utils/storage");
+const api = require("../../utils/api");
 
 Page({
   data: {
     name: "",
     phone: "",
-    isEditing: false,
+    newPasscode: "",
+    confirmPasscode: "",
+    showPasscodeForm: false,
   },
 
   onLoad() {
@@ -16,93 +18,75 @@ Page({
     this.loadUserInfo();
   },
 
-  // 加载用户信息
   loadUserInfo() {
-    const userInfo = storage.getUserInfo();
-    this.setData({
-      name: userInfo.name || "",
-      phone: userInfo.phone || "",
-    });
-  },
-
-  // 切换编辑模式
-  toggleEdit() {
-    if (this.data.isEditing) {
-      // 保存信息
-      this.saveUserInfo();
-    }
-    this.setData({
-      isEditing: !this.data.isEditing,
-    });
-  },
-
-  // 名称输入
-  onNameInput(e) {
-    this.setData({
-      name: e.detail.value,
-    });
-  },
-
-  // 手机号输入
-  onPhoneInput(e) {
-    this.setData({
-      phone: e.detail.value,
-    });
-  },
-
-  // 保存用户信息
-  saveUserInfo() {
-    const { name, phone } = this.data;
-
-    // 验证手机号格式
-    if (phone && !/^1[3-9]\d{9}$/.test(phone)) {
-      wx.showToast({
-        title: "请输入正确的手机号",
-        icon: "none",
+    api
+      .getUserInfo()
+      .then((userInfo) => {
+        this.setData({
+          name: userInfo.name || "",
+          phone: userInfo.phone || "",
+        });
+      })
+      .catch((e) => {
+        if (e.message === "未登录或登录已过期") wx.reLaunch({ url: "/pages/login/login" });
       });
-      return false;
-    }
-
-    const success = storage.saveUserInfo({ name, phone });
-    if (success) {
-      wx.showToast({
-        title: "保存成功",
-        icon: "success",
-      });
-      return true;
-    } else {
-      wx.showToast({
-        title: "保存失败",
-        icon: "error",
-      });
-      return false;
-    }
   },
 
-  // 清除本地数据
+  togglePasscodeForm() {
+    this.setData({ showPasscodeForm: !this.data.showPasscodeForm });
+  },
+
+  onNewPasscodeInput(e) {
+    this.setData({ newPasscode: e.detail.value });
+  },
+
+  onConfirmPasscodeInput(e) {
+    this.setData({ confirmPasscode: e.detail.value });
+  },
+
+  savePasscode() {
+    const { newPasscode, confirmPasscode } = this.data;
+    if (!newPasscode || !confirmPasscode) {
+      wx.showToast({ title: "请输入新密码并确认", icon: "none" });
+      return;
+    }
+    if (newPasscode !== confirmPasscode) {
+      wx.showToast({ title: "两次输入的密码不一致", icon: "none" });
+      return;
+    }
+    api
+      .putPasscode(newPasscode)
+      .then((res) => {
+        if (res.success) {
+          wx.showToast({ title: "密码修改成功", icon: "success" });
+          this.setData({ newPasscode: "", confirmPasscode: "", showPasscodeForm: false });
+        } else {
+          wx.showToast({ title: res.message || "修改失败", icon: "none" });
+        }
+      })
+      .catch((e) => {
+        if (e.message === "未登录或登录已过期") wx.reLaunch({ url: "/pages/login/login" });
+        else wx.showToast({ title: e.message || "修改失败", icon: "none" });
+      });
+  },
+
+  goToMyInbound() {
+    wx.navigateTo({ url: "/pages/my-inbound/my-inbound" });
+  },
+
+  goToMyOutbound() {
+    wx.navigateTo({ url: "/pages/my-outbound/my-outbound" });
+  },
+
   clearData() {
     wx.showModal({
-      title: "确认清除",
-      content: "确定要清除所有本地数据吗？此操作不可恢复！",
+      title: "确认退出",
+      content: "确定要退出登录吗？",
       confirmColor: "#f27d51",
       success: (res) => {
         if (res.confirm) {
-          try {
-            wx.clearStorageSync();
-            wx.showToast({
-              title: "数据已清除",
-              icon: "success",
-            });
-            this.setData({
-              name: "",
-              phone: "",
-            });
-          } catch (e) {
-            wx.showToast({
-              title: "清除失败",
-              icon: "error",
-            });
-          }
+          api.clearToken();
+          wx.reLaunch({ url: "/pages/login/login" });
         }
       },
     });

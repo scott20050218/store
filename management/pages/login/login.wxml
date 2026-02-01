@@ -1,0 +1,36 @@
+<!--pages/login/login.wxml - 使用前必须注册，每次通过 wx.login 获得 openid-->
+<navigation-bar title="{{mode === 'register' ? '注册' : '登录'}}" back="{{false}}" color="black" background="#FFF"></navigation-bar>
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="login-page">
+    <view class="login-card">
+      <text class="login-title">仓库管理</text>
+      <text class="login-desc">使用前请先注册</text>
+
+      <view class="mode-tabs">
+        <view class="tab {{mode === 'login' ? 'active' : ''}}" bindtap="switchMode" data-mode="login">登录</view>
+        <view class="tab {{mode === 'register' ? 'active' : ''}}" bindtap="switchMode" data-mode="register">注册</view>
+      </view>
+
+      <block wx:if="{{mode === 'register'}}">
+        <view class="form-item">
+          <text class="form-label">手机号（需已在后台登记）</text>
+          <input class="form-input" type="number" maxlength="11" placeholder="请输入手机号或微信授权获取" value="{{phone}}" bindinput="onPhoneInput" />
+          <button class="phone-auth-btn" open-type="getPhoneNumber" bindgetphonenumber="onGetPhoneNumber">微信授权获取手机号</button>
+        </view>
+        <view class="form-item">
+          <text class="form-label">设置密码</text>
+          <input class="form-input" password placeholder="请设置密码" value="{{passcode}}" bindinput="onPasscodeInput" />
+        </view>
+        <button class="login-btn" loading="{{loading}}" disabled="{{loading}}" bindtap="onRegister">注册</button>
+      </block>
+
+      <block wx:else>
+        <view class="form-item">
+          <text class="form-label">密码</text>
+          <input class="form-input" password placeholder="请输入密码" value="{{passcode}}" bindinput="onPasscodeInput" />
+        </view>
+        <button class="login-btn" loading="{{loading}}" disabled="{{loading}}" bindtap="onLogin">登录</button>
+      </block>
+    </view>
+  </view>
+</scroll-view>

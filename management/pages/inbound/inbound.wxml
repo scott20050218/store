@@ -4,15 +4,12 @@
   <view class="container">
 
     <view class="form-card">
-      <!-- 入库时间（年-月-日 时:分:秒） -->
+      <!-- 入库时间：仅显示当前时间，不可编辑 -->
       <view class="form-item">
         <text class="form-label">入库时间</text>
-        <picker mode="multiSelector" value="{{dateTimeValue}}" range="{{dateTimeColumns}}" bindchange="onDateTimeChange" bindcolumnchange="onDateTimeColumnChange">
-          <view class="picker-value">
-            <text>{{inboundDateTime || '请选择'}}</text>
-            <text class="picker-arrow">></text>
-          </view>
-        </picker>
+        <view class="form-value-readonly">
+          <text>{{inboundDateTime || '--'}}</text>
+        </view>
       </view>
 
       <!-- 物品类型：选择或自定义 -->

@@ -10,37 +10,52 @@
       <text class="greeting">{{name || '未设置姓名'}}</text>
     </view>
 
-    <!-- 信息卡片 -->
+    <!-- 信息卡片：姓名和手机号只读 -->
     <view class="info-card">
       <view class="card-title">
         <text>个人信息</text>
-        <text class="edit-btn" bindtap="toggleEdit">{{isEditing ? '保存' : '编辑'}}</text>
       </view>
-
       <view class="info-item">
         <text class="info-label">姓名</text>
-        <input 
-          wx:if="{{isEditing}}" 
-          class="info-input" 
-          placeholder="请输入姓名" 
-          value="{{name}}" 
-          bindinput="onNameInput"
-        />
-        <text wx:else class="info-value">{{name || '未设置'}}</text>
+        <text class="info-value">{{name || '未设置'}}</text>
       </view>
-
       <view class="info-item">
         <text class="info-label">手机号码</text>
-        <input 
-          wx:if="{{isEditing}}" 
-          class="info-input" 
-          type="number" 
-          maxlength="11"
-          placeholder="请输入手机号码" 
-          value="{{phone}}" 
-          bindinput="onPhoneInput"
-        />
-        <text wx:else class="info-value">{{phone || '未设置'}}</text>
+        <text class="info-value">{{phone || '未设置'}}</text>
+      </view>
+    </view>
+
+    <!-- 修改密码：点击展开 -->
+    <view class="info-card">
+      <view class="settings-item" bindtap="togglePasscodeForm">
+        <text class="settings-label">修改密码</text>
+        <text class="settings-arrow">{{showPasscodeForm ? '收起' : '>'}}</text>
+      </view>
+      <block wx:if="{{showPasscodeForm}}">
+        <view class="info-item">
+          <text class="info-label">新密码</text>
+          <input class="info-input" password placeholder="请输入新密码" value="{{newPasscode}}" bindinput="onNewPasscodeInput" />
+        </view>
+        <view class="info-item">
+          <text class="info-label">确认密码</text>
+          <input class="info-input" password placeholder="请再次输入新密码" value="{{confirmPasscode}}" bindinput="onConfirmPasscodeInput" />
+        </view>
+        <button class="save-passcode-btn" bindtap="savePasscode">保存密码</button>
+      </block>
+    </view>
+
+    <!-- 我的记录 -->
+    <view class="settings-card">
+      <view class="card-title">
+        <text>我的记录</text>
+      </view>
+      <view class="settings-item" bindtap="goToMyInbound">
+        <text class="settings-label">我的入库</text>
+        <text class="settings-arrow">></text>
+      </view>
+      <view class="settings-item" bindtap="goToMyOutbound">
+        <text class="settings-label">我的出库</text>
+        <text class="settings-arrow">></text>
       </view>
     </view>
 
@@ -51,7 +66,7 @@
       </view>
 
       <view class="settings-item" bindtap="clearData">
-        <text class="settings-label">清除本地数据</text>
+        <text class="settings-label">退出登录</text>
         <text class="settings-arrow danger">></text>
       </view>
     </view>
