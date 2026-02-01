@@ -1,0 +1,56 @@
+<!--pages/outbound/outbound.wxml-->
+<navigation-bar title="出库" back="{{true}}"  color="black" background="#FFF"></navigation-bar>
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+    <view class="list-header">
+      <text class="list-title">物品列表</text>
+      <text class="list-hint">点击「出库」按钮进行出库操作</text>
+    </view>
+
+    <view class="item-list" wx:if="{{list.length > 0}}">
+      <view class="item-row" wx:for="{{list}}" wx:key="id">
+        <view class="item-main">
+          <view class="item-name-row">
+            <text class="item-name">{{item.itemType}}</text>
+            <view class="item-tag" wx:if="{{item.tag}}" style="background-color: {{item.tag}}"></view>
+          </view>
+          <text class="item-qty">数量: {{item.quantity}}</text>
+        </view>
+        <view class="item-action" data-index="{{index}}" bindtap="onOutboundTap">
+          <text>出库</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty" wx:else>
+      <text class="empty-icon">📦</text>
+      <text class="empty-text">暂无库存</text>
+      <text class="empty-hint">请先进行入库操作</text>
+    </view>
+  </view>
+</scroll-view>
+
+<!-- 出库数量弹窗 -->
+<view class="modal-mask" wx:if="{{showQuantityModal}}" bindtap="onCloseQuantityModal"></view>
+<view class="modal-wrap" wx:if="{{showQuantityModal}}">
+  <view class="modal-content" catchtap="">
+    <view class="modal-title">出库数量</view>
+    <view class="modal-item" wx:if="{{outboundItem}}">
+      <text class="modal-label">物品：</text>
+      <text class="modal-value">{{outboundItem.itemType}}</text>
+      <view class="modal-tag" wx:if="{{outboundItem.tag}}" style="background-color: {{outboundItem.tag}}"></view>
+    </view>
+    <view class="modal-item">
+      <text class="modal-label">可出库：</text>
+      <text class="modal-value">{{outboundItem.quantity}}</text>
+    </view>
+    <view class="modal-input-wrap">
+      <text class="modal-label">出库数量：</text>
+      <input class="modal-input" type="digit" placeholder="请输入数量" value="{{outboundQuantity}}" bindinput="onQuantityInput" />
+    </view>
+    <view class="modal-btns">
+      <view class="modal-btn cancel" bindtap="onCloseQuantityModal">取消</view>
+      <view class="modal-btn confirm" bindtap="onConfirmOutbound">确定</view>
+    </view>
+  </view>
+</view>

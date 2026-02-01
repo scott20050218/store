@@ -1,0 +1,49 @@
+<!--pages/statistics/statistics.wxml-->
+<navigation-bar title="库存统计" back="{{true}}" backAsHome="{{true}}" color="black" background="#FFF"></navigation-bar>
+<scroll-view class="scrollarea" scroll-y type="list" refresher-enabled="{{true}}" bindrefresherrefresh="onPullDownRefresh">
+  <view class="container">
+    <!-- 告警概览 -->
+    <view class="warning-overview" wx:if="{{hasWarnings}}">
+      <view class="warning-title">告警提醒</view>
+      <view class="warning-items">
+        <view class="warning-item low-stock" wx:if="{{lowStockCount > 0}}">
+          <text class="warning-icon">⚠️</text>
+          <text class="warning-text">{{lowStockCount}}种物品库存不足</text>
+        </view>
+        <view class="warning-item expiry" wx:if="{{expiryWarningCount > 0}}">
+          <text class="warning-icon">⏰</text>
+          <text class="warning-text">{{expiryWarningCount}}种物品即将过期</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 库存列表：名称+货架+标签+入库时间+到期时间+数量，小于过期提醒时间则告警 -->
+    <view class="section-title">库存明细</view>
+    <view class="stats-list" wx:if="{{list.length > 0}}">
+      <view class="stats-row {{item.expiryWarning ? 'row-expiry-alarm' : ''}}" wx:for="{{list}}" wx:key="id">
+        <view class="row-left">
+          <view class="row-name-wrap">
+            <text class="row-name">{{item.itemType}}</text>
+            <text class="row-location" wx:if="{{item.location}}">货架：{{item.location}}</text>
+            <view class="row-tag" wx:if="{{item.tag}}" style="background-color: {{item.tag}}"></view>
+          </view>
+          <view class="row-meta">
+            <text class="row-meta-item">入库：{{item.inboundDate || '无'}}</text>
+            <text class="row-meta-item">到期：{{item.expiryDate || '无'}}</text>
+          </view>
+        </view>
+        <view class="row-right">
+          <text class="row-qty">{{item.quantity}}</text>
+          <text class="row-alarm" wx:if="{{item.expiryWarning}}">即将过期</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{list.length === 0}}">
+      <text class="empty-icon">📦</text>
+      <text class="empty-text">暂无库存数据</text>
+      <text class="empty-hint">请先进行入库操作</text>
+    </view>
+  </view>
+</scroll-view>

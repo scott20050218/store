@@ -1,0 +1,27 @@
+<!--index.wxml-->
+<navigation-bar title="仓库管理" back="{{false}}" color="black" background="#FFF"></navigation-bar>
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+
+    
+    <view class="button-container">
+      <view class="action-button overview-btn" bindtap="goToOverview">
+        <view class="btn-icon">📋</view>
+        <text class="btn-text">物品总览</text>
+        <text class="btn-desc">查看物品到期情况</text>
+      </view>
+
+      <view class="action-button inbound-btn" bindtap="goToInbound">
+        <view class="btn-icon">📦</view>
+        <text class="btn-text">入库</text>
+        <text class="btn-desc">添加物品到仓库</text>
+      </view>
+      
+      <view class="action-button outbound-btn" bindtap="goToOutbound">
+        <view class="btn-icon">📤</view>
+        <text class="btn-text">出库</text>
+        <text class="btn-desc">从仓库取出物品</text>
+      </view>
+    </view>
+  </view>
+</scroll-view>

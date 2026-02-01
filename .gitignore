@@ -1,0 +1,44 @@
+# === 系统与编辑器 ===
+.DS_Store
+.DS_Store?
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.sublime-*
+
+# === 后端 backend (Python) ===
+backend/.venv/
+backend/venv/
+backend/env/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.py[cod]
+backend/**/*.py[cod]
+backend/.env
+backend/*.db
+backend/*.sqlite3
+backend/uploads/*
+!backend/uploads/.gitkeep
+backend/*.egg-info/
+backend/.eggs/
+backend/dist/
+backend/build/
+backend/.pytest_cache/
+backend/.coverage
+backend/htmlcov/
+backend/.mypy_cache/
+
+# === 小程序 management (微信) ===
+management/node_modules/
+management/project.private.config.json
+management/npm-debug.log*
+management/.miniprogram/
+
+# === 日志与临时 ===
+*.log
+*.tmp
+*.temp
+.cache/

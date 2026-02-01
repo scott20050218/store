@@ -1,0 +1,33 @@
+<!--pages/overview/overview.wxml 物品总览-->
+<navigation-bar title="物品总览" back="{{true}}" color="black" background="#FFF"></navigation-bar>
+<scroll-view class="scrollarea" scroll-y type="list" refresher-enabled="{{true}}" bindrefresherrefresh="onPullDownRefresh">
+  <view class="container">
+    <view class="list" wx:if="{{list.length > 0}}">
+      <view class="item" wx:for="{{list}}" wx:key="id">
+        <view class="item-left">
+          <view class="item-icon-box">
+            <text class="item-icon-box-inner">📦</text>
+          </view>
+          <view class="item-info">
+            <text class="item-name">{{item.itemType}}</text>
+            <text class="item-qty">X{{item.quantity}}</text>
+          </view>
+        </view>
+        <view class="item-right">
+          <text class="item-remaining-label">剩余</text>
+          <text class="item-days {{item.daysRemaining <= 7 ? 'warning' : ''}}">{{item.daysRemaining}}天</text>
+          <view class="progress-wrap">
+            <view class="progress-bar">
+              <view class="progress-fill" style="width: {{item.progressPercent}}%"></view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="empty" wx:else>
+      <text class="empty-icon">📋</text>
+      <text class="empty-text">暂无物品</text>
+      <text class="empty-hint">请先进行入库操作</text>
+    </view>
+  </view>
+</scroll-view>

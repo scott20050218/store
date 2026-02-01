@@ -1,0 +1,118 @@
+<!--pages/inbound/inbound.wxml-->
+<navigation-bar title="入库" back="{{true}}"  color="black" background="#FFF"></navigation-bar>
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+
+    <view class="form-card">
+      <!-- 入库时间（年-月-日 时:分:秒） -->
+      <view class="form-item">
+        <text class="form-label">入库时间</text>
+        <picker mode="multiSelector" value="{{dateTimeValue}}" range="{{dateTimeColumns}}" bindchange="onDateTimeChange" bindcolumnchange="onDateTimeColumnChange">
+          <view class="picker-value">
+            <text>{{inboundDateTime || '请选择'}}</text>
+            <text class="picker-arrow">></text>
+          </view>
+        </picker>
+      </view>
+
+      <!-- 物品类型：选择或自定义 -->
+      <view class="form-item">
+        <text class="form-label">物品类型</text>
+        <picker mode="selector" range="{{itemTypes}}" value="{{typeIndex}}" bindchange="onTypeChange">
+          <view class="picker-value">
+            <text>{{itemTypes[typeIndex]}}</text>
+            <text class="picker-arrow">></text>
+          </view>
+        </picker>
+      </view>
+      <view class="form-item custom-type-item" wx:if="{{showCustomInput}}">
+        <text class="form-label">自定义类型</text>
+        <input class="form-input" placeholder="请输入物品类型" value="{{customType}}" bindinput="onCustomTypeInput" />
+      </view>
+
+      <!-- 到期日期：物品多长时间后过期（1个月/3个月） -->
+      <view class="form-item">
+        <text class="form-label">到期日期</text>
+        <picker mode="selector" range="{{expiryOptions}}" value="{{expiryIndex}}" bindchange="onExpiryChange">
+          <view class="picker-value">
+            <text>{{expiryOptions[expiryIndex]}}</text>
+            <text class="picker-arrow">></text>
+          </view>
+        </picker>
+      </view>
+
+      <!-- 到期提醒：还有多少天过期时提醒（3天/7天） -->
+      <view class="form-item">
+        <text class="form-label">到期提醒</text>
+        <picker mode="selector" range="{{reminderOptions}}" value="{{reminderIndex}}" bindchange="onReminderChange">
+          <view class="picker-value">
+            <text>{{reminderOptions[reminderIndex]}}</text>
+            <text class="picker-arrow">></text>
+          </view>
+        </picker>
+      </view>
+
+      <!-- 生产日期（选填） -->
+      <view class="form-item">
+        <text class="form-label">生产日期<text class="optional">选填</text></text>
+        <picker mode="date" value="{{productionDate}}" bindchange="onProductionDateChange">
+          <view class="picker-value">
+            <text class="{{productionDate ? '' : 'placeholder'}}">{{productionDate || '请选择'}}</text>
+            <text class="picker-arrow">></text>
+          </view>
+        </picker>
+      </view>
+
+      <!-- 数量：仅数字、仅正数 -->
+      <view class="form-item">
+        <text class="form-label">数量</text>
+        <input class="form-input" type="digit" inputmode="numeric" placeholder="请输入正整数" value="{{quantity}}" bindinput="onQuantityInput" />
+      </view>
+
+      <!-- 标签选择（颜色） -->
+      <view class="form-item form-item-col">
+        <text class="form-label">标签</text>
+        <view class="tag-list">
+          <view
+            class="tag-item {{tagIndex === index ? 'selected' : ''}}"
+            wx:for="{{tagColors}}"
+            wx:key="index"
+            data-index="{{index}}"
+            style="background-color: {{item}}"
+            bindtap="onTagSelect"
+          >
+            <text class="tag-check" wx:if="{{tagIndex === index}}">✓</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 位置选择 -->
+      <view class="form-item">
+        <text class="form-label">位置</text>
+        <picker mode="selector" range="{{locationOptions}}" value="{{locationIndex}}" bindchange="onLocationChange">
+          <view class="picker-value">
+            <text class="{{locationIndex > 0 ? '' : 'placeholder'}}">{{locationOptions[locationIndex]}}</text>
+            <text class="picker-arrow">></text>
+          </view>
+        </picker>
+      </view>
+
+      <!-- 拍照 -->
+      <view class="form-item form-item-col">
+        <text class="form-label">拍照</text>
+        <view class="photo-area">
+          <view class="photo-btn" wx:if="{{!photoPath}}" bindtap="onTakePhoto">
+            <text class="photo-icon">📷</text>
+            <text class="photo-text">拍照/选择图片</text>
+          </view>
+          <view class="photo-preview" wx:else>
+            <image class="photo-img" src="{{photoPath}}" mode="aspectFill" />
+            <view class="photo-remove" bindtap="onRemovePhoto">删除</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <button class="submit-btn" bindtap="onSubmit">确认入库</button>
+  </view>
+</scroll-view>

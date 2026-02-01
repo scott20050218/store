@@ -1,0 +1,64 @@
+<!--pages/profile/profile.wxml-->
+<navigation-bar title="我的" back="{{true}}" backAsHome="{{true}}" color="black" background="#FFF"></navigation-bar>
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+    <!-- 头像区域 -->
+    <view class="profile-header">
+      <view class="avatar">
+        <text class="avatar-text">{{name ? name[0] : '用'}}</text>
+      </view>
+      <text class="greeting">{{name || '未设置姓名'}}</text>
+    </view>
+
+    <!-- 信息卡片 -->
+    <view class="info-card">
+      <view class="card-title">
+        <text>个人信息</text>
+        <text class="edit-btn" bindtap="toggleEdit">{{isEditing ? '保存' : '编辑'}}</text>
+      </view>
+
+      <view class="info-item">
+        <text class="info-label">姓名</text>
+        <input 
+          wx:if="{{isEditing}}" 
+          class="info-input" 
+          placeholder="请输入姓名" 
+          value="{{name}}" 
+          bindinput="onNameInput"
+        />
+        <text wx:else class="info-value">{{name || '未设置'}}</text>
+      </view>
+
+      <view class="info-item">
+        <text class="info-label">手机号码</text>
+        <input 
+          wx:if="{{isEditing}}" 
+          class="info-input" 
+          type="number" 
+          maxlength="11"
+          placeholder="请输入手机号码" 
+          value="{{phone}}" 
+          bindinput="onPhoneInput"
+        />
+        <text wx:else class="info-value">{{phone || '未设置'}}</text>
+      </view>
+    </view>
+
+    <!-- 其他设置 -->
+    <view class="settings-card">
+      <view class="card-title">
+        <text>其他设置</text>
+      </view>
+
+      <view class="settings-item" bindtap="clearData">
+        <text class="settings-label">清除本地数据</text>
+        <text class="settings-arrow danger">></text>
+      </view>
+    </view>
+
+    <!-- 版本信息 -->
+    <view class="version-info">
+      <text>仓库管理系统 v1.0.0</text>
+    </view>
+  </view>
+</scroll-view>
