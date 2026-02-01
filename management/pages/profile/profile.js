@@ -78,6 +78,10 @@ Page({
     wx.navigateTo({ url: "/pages/my-outbound/my-outbound" });
   },
 
+  goToUserManage() {
+    wx.navigateTo({ url: "/pages/user-manage/user-manage" });
+  },
+
   clearData() {
     wx.showModal({
       title: "确认退出",

@@ -69,6 +69,10 @@
         <text class="settings-label">退出登录</text>
         <text class="settings-arrow danger">></text>
       </view>
+      <view class="settings-item" wx:if="{{name === 'admin'}}" bindtap="goToUserManage">
+        <text class="settings-label">管理用户</text>
+        <text class="settings-arrow">></text>
+      </view>
     </view>
 
     <!-- 版本信息 -->

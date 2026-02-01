@@ -21,6 +21,7 @@ def init_users():
     db = SessionLocal()
     try:
         users_to_add = [
+            {"name": "admin", "phone": "13800000000"},  # 管理员，用于管理用户
             {"name": "张三", "phone": "13800138001"},
             {"name": "李四", "phone": "13800138002"},
             # 按需添加更多用户
