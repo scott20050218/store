@@ -9,7 +9,7 @@ from app.models.inventory import InventoryRecord
 from app.models.inbound_history import InboundHistory
 from app.models.outbound_history import OutboundHistory
 from app.models.user import User
-from app.services.config_service import get_config_value, get_expiry_warning_days_threshold
+from app.services.config_service import get_expiry_warning_days_threshold
 
 
 def add_inbound(
@@ -104,51 +104,6 @@ def get_all_records(db: Session) -> List[InventoryRecord]:
         .order_by(InventoryRecord.inbound_date.asc(), InventoryRecord.create_time.asc())
         .all()
     )
-
-
-def get_stats(db: Session) -> List[dict]:
-    """按物品类型聚合：总量、低库存、即将过期、最近过期日"""
-    records = get_all_records(db)
-    low_threshold = get_config_value(db, "LOW_STOCK_THRESHOLD") or 10
-    expiry_days = get_expiry_warning_days_threshold(db)
-    today = date.today()
-    by_type = {}
-    for r in records:
-        if r.item_type not in by_type:
-            by_type[r.item_type] = {
-                "type": r.item_type,
-                "totalQuantity": 0,
-                "items": [],
-                "nearestExpiryDate": None,
-            }
-        by_type[r.item_type]["totalQuantity"] += r.quantity
-        by_type[r.item_type]["items"].append(r)
-        if r.expiry_date:
-            if (
-                by_type[r.item_type]["nearestExpiryDate"] is None
-                or r.expiry_date < by_type[r.item_type]["nearestExpiryDate"]
-            ):
-                by_type[r.item_type]["nearestExpiryDate"] = r.expiry_date.isoformat()
-    result = []
-    for item_type, data in by_type.items():
-        total = data["totalQuantity"]
-        nearest = data["nearestExpiryDate"]
-        days_until = None
-        if nearest:
-            d = date.fromisoformat(nearest)
-            days_until = (d - today).days
-        has_expiry_warning = days_until is not None and days_until <= expiry_days
-        result.append(
-            {
-                "type": item_type,
-                "totalQuantity": total,
-                "isLowStock": total > 0 and total < low_threshold,
-                "isEmpty": total == 0,
-                "hasExpiryWarning": has_expiry_warning,
-                "nearestExpiryDate": nearest,
-            }
-        )
-    return result
 
 
 def get_overview(db: Session) -> List[dict]:
@@ -256,7 +211,7 @@ def get_io_details(
                 InboundHistory.inbound_date >= start,
                 InboundHistory.inbound_date <= end,
             )
-            .order_by(InboundHistory.inbound_date.desc(), InboundHistory.create_time.desc())
+            .order_by(InboundHistory.create_time.desc())
             .all()
         )
         for r, user_name in rows:
@@ -279,7 +234,7 @@ def get_io_details(
                 OutboundHistory.outbound_date >= start,
                 OutboundHistory.outbound_date <= end,
             )
-            .order_by(OutboundHistory.outbound_date.desc(), OutboundHistory.create_time.desc())
+            .order_by( OutboundHistory.create_time.desc())
             .all()
         )
         for r, user_name in rows:
@@ -355,20 +310,3 @@ def get_my_outbound(
         }
         for r in items
     ], has_more
-
-
-def get_statistics_list(db: Session) -> List[dict]:
-    """物品+标签+数量+过期日期，按物品名排序"""
-    records = get_all_records(db)
-    result = [
-        {
-            "id": r.id,
-            "itemType": r.item_type,
-            "tag": r.tag or "",
-            "quantity": r.quantity,
-            "expiryDate": r.expiry_date.isoformat() if r.expiry_date else "",
-        }
-        for r in records
-    ]
-    result.sort(key=lambda x: (x["itemType"] or "", x["expiryDate"]))
-    return result

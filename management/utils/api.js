@@ -111,13 +111,6 @@ function postOutbound(body) {
   return request({ method: 'POST', path: '/api/outbound', data: body })
 }
 
-// 库存统计
-function getInventoryStats() {
-  return request({ method: 'GET', path: '/api/inventory/stats' }).then(
-    res => (res.success && res.data && res.data.items ? res.data.items : [])
-  )
-}
-
 // 物品总览
 function getInventoryOverview() {
   return request({ method: 'GET', path: '/api/inventory/overview' }).then(
@@ -128,13 +121,6 @@ function getInventoryOverview() {
 // 出库列表
 function getOutboundList() {
   return request({ method: 'GET', path: '/api/inventory/outbound-list' }).then(
-    res => (res.success && res.data && res.data.items ? res.data.items : [])
-  )
-}
-
-// 统计列表
-function getStatisticsList() {
-  return request({ method: 'GET', path: '/api/inventory/statistics-list' }).then(
     res => (res.success && res.data && res.data.items ? res.data.items : [])
   )
 }
@@ -162,10 +148,6 @@ function getUserInfo() {
   return request({ method: 'GET', path: '/api/user/info' }).then(
     res => (res.success && res.data ? res.data : { name: '', phone: '' })
   )
-}
-
-function putUserInfo(body) {
-  return request({ method: 'PUT', path: '/api/user/info', data: body })
 }
 
 function putPasscode(passcode) {
@@ -243,14 +225,11 @@ module.exports = {
   loginWithCode,
   postInbound,
   postOutbound,
-  getInventoryStats,
   getInventoryOverview,
   getOutboundList,
-  getStatisticsList,
   getInventoryIOStats,
   getInventoryIODetails,
   getUserInfo,
-  putUserInfo,
   putPasscode,
   getMyInbound,
   getMyOutbound,

@@ -19,14 +19,9 @@ function getToday() {
 
 Page({
   data: {
-    stats: [],
-    list: [],
     ioStats: [],
     startDate: getMonthStart(),
     endDate: getToday(),
-    hasWarnings: false,
-    lowStockCount: 0,
-    expiryWarningCount: 0,
     detailMode: "",
     detailItemType: "",
     detailList: [],
@@ -35,12 +30,10 @@ Page({
   },
 
   onLoad() {
-    // this.loadStats();
     this.loadIOStats();
   },
 
   onShow() {
-    // this.loadStats();
     this.loadIOStats();
   },
 
@@ -115,45 +108,8 @@ Page({
       });
   },
 
-  // loadStats() {
-  //   Promise.all([api.getInventoryStats(), api.getStatisticsList()])
-  //     .then(([stats, list]) => {
-  //       let lowStockCount = 0;
-  //       let expiryWarningCount = 0;
-  //       (stats || []).forEach((item) => {
-  //         if (item.isLowStock) lowStockCount++;
-  //         if (item.hasExpiryWarning) expiryWarningCount++;
-  //       });
-  //       this.setData({
-  //         stats: stats || [],
-  //         list: list || [],
-  //         hasWarnings: lowStockCount > 0 || expiryWarningCount > 0,
-  //         lowStockCount,
-  //         expiryWarningCount,
-  //       });
-  //     })
-  //     .catch((e) => {
-  //       if (e.message === "未登录或登录已过期")
-  //         wx.reLaunch({ url: "/pages/login/login" });
-  //       else wx.showToast({ title: e.message || "加载失败", icon: "none" });
-  //     });
-  // },
-
-  // 下拉刷新
   onPullDownRefresh() {
-    // this.loadStats();
     this.loadIOStats();
     wx.stopPullDownRefresh();
-  },
-
-  // 计算剩余天数的显示文本
-  getDaysText(days) {
-    if (days < 0) {
-      return `已过期${Math.abs(days)}天`;
-    } else if (days === 0) {
-      return "今天过期";
-    } else {
-      return `${days}天后过期`;
-    }
   },
 });
