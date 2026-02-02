@@ -1,6 +1,7 @@
 // storage.js - 仅保留格式化与默认物品类型；业务数据通过 api 获取，不保存在本地
 
 const ITEM_TYPES = ['大米', '油', '肉', '鸡蛋']
+const UNIT = ['袋', '瓶', '箱', '斤', '个']
 
 function formatDate(date) {
   const year = date.getFullYear()
@@ -25,6 +26,7 @@ function formatDateTime(date) {
 
 module.exports = {
   ITEM_TYPES,
+  UNIT,
   formatDate,
   formatTime,
   formatDateTime,

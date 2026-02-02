@@ -11,7 +11,7 @@
           <text class="detail-meta" wx:if="{{item.location}}">货架：{{item.location}}</text>
         </view>
         <view class="detail-right">
-          <text class="detail-qty">{{item.quantity}}</text>
+          <text class="detail-qty">{{item.quantity}} {{item.displayUnit}}</text>
         </view>
       </view>
     </view>

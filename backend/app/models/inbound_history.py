@@ -12,6 +12,7 @@ class InboundHistory(Base):
     user_id = Column(BigInteger, nullable=False, index=True)
     inventory_record_id = Column(String(36), nullable=False, index=True)  # 关联 inventory_records
     item_type = Column(String(64), nullable=False)
+    unit = Column(String(32), nullable=True, default="")
     quantity = Column(Integer, nullable=False)
     expiry_date = Column(Date, nullable=False)
     inbound_date = Column(Date, nullable=False)

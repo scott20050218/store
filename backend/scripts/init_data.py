@@ -45,6 +45,7 @@ def init_config():
     try:
         defaults = {
             "ITEM_TYPES": json.dumps(["大米", "油", "肉", "鸡蛋"]),
+            "UNIT": json.dumps(["袋", "瓶", "箱", "斤", "个"]),
             "LOW_STOCK_THRESHOLD": "10",
             "EXPIRY_WARNING_DAYS": "7",
             "EXPIRY": json.dumps([1, 3, 6]),

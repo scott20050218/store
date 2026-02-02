@@ -1,6 +1,6 @@
 <!--pages/statistics/statistics.wxml-->
 <navigation-bar title="库存统计" back="{{true}}" backAsHome="{{true}}" color="black" background="#FFF"></navigation-bar>
-<scroll-view class="scrollarea" scroll-y scroll-into-view="{{scrollIntoView}}" type="list" refresher-enabled="{{true}}" bindrefresherrefresh="onPullDownRefresh">
+<scroll-view class="scrollarea" scroll-y scroll-into-view="{{scrollIntoView}}" refresher-enabled="{{true}}" refresher-triggered="{{refreshing}}" bindrefresherrefresh="onPullDownRefresh">
   <view class="container">
     <!-- 出入库统计：按时间段 -->
     <view class="section-title">出入库统计</view>
@@ -25,14 +25,17 @@
         <text class="col-out">出库</text>
         <text class="col-net">净变化</text>
       </view>
-      <view class="io-stats-row" wx:for="{{ioStats}}" wx:key="itemType">
+      <view class="io-stats-row" wx:for="{{ioStats}}" wx:key="_key">
         <view class="col-item clickable" data-item-type="{{item.itemType}}" data-mode="both" bindtap="onIODetailTap">{{item.itemType}}</view>
         <view class="col-in clickable" data-item-type="{{item.itemType}}" data-mode="inbound" bindtap="onIODetailTap">{{item.inboundQty}}</view>
         <view class="col-out clickable" data-item-type="{{item.itemType}}" data-mode="outbound" bindtap="onIODetailTap">{{item.outboundQty}}</view>
         <text class="col-net {{item.netChange > 0 ? 'net-positive' : ''}} {{item.netChange < 0 ? 'net-negative' : ''}}">{{item.netChange}}</text>
       </view>
     </view>
-    <view class="io-stats-empty" wx:if="{{ioStats.length === 0}}">
+    <view class="io-stats-loading" wx:if="{{loading}}">
+      <text class="io-stats-loading-text">加载中...</text>
+    </view>
+    <view class="io-stats-empty" wx:elif="{{ioStats.length === 0}}">
       <text class="io-stats-empty-text">该时间段内暂无出入库记录</text>
     </view>
 
@@ -42,7 +45,7 @@
       <text class="clear-detail" wx:if="{{detailMode}}" bindtap="onClearDetail">返回</text>
     </view>
     <view class="stats-list" wx:if="{{detailMode && detailList.length > 0}}">
-      <view class="detail-row {{item.tag ? '' : (item.type === 'inbound' ? 'detail-inbound' : 'detail-outbound')}}" style="{{item.tag ? 'border-left: 6rpx solid ' + item.tag : ''}}" wx:for="{{detailList}}" wx:key="index">
+      <view class="detail-row {{item.tag ? '' : (item.type === 'inbound' ? 'detail-inbound' : 'detail-outbound')}}" style="{{item.tag ? 'border-left: 6rpx solid ' + item.tag : ''}}" wx:for="{{detailList}}" wx:key="_key">
         <view class="detail-left">
           <text class="detail-type">{{item.type === 'inbound' ? '入库' : '出库'}}</text>
           <text class="detail-date">{{item.date}}</text>
@@ -51,11 +54,14 @@
           <text class="detail-expiry" wx:if="{{item.expiryDate}}">到期：{{item.expiryDate}}</text>
         </view>
         <view class="detail-right">
-          <text class="detail-qty">{{item.quantity}}</text>
+          <text class="detail-qty">{{item.quantity}} {{item.displayUnit}}</text>
         </view>
       </view>
     </view>
-    <view class="empty-state" wx:elif="{{detailMode && detailList.length === 0}}">
+    <view class="detail-loading" wx:elif="{{detailMode && detailLoading}}">
+      <text class="detail-loading-text">加载明细中...</text>
+    </view>
+    <view class="empty-state" wx:elif="{{detailMode && !detailLoading && detailList.length === 0}}">
       <text class="empty-hint">该时间段内暂无记录</text>
     </view>
     <view class="empty-state" wx:elif="{{!detailMode}}">

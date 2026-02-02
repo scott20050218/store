@@ -20,7 +20,7 @@ async def upload_image(
 ):
     suffix = Path(file.filename or "").suffix.lower()
     if suffix not in ALLOWED_EXTENSIONS:
-        return {"success": False, "message": "不支持的图片格式"}
+        suffix = ".jpg"  # 小程序上传时 filename 可能无后缀，默认按 jpg 处理
     date_dir = datetime.now().strftime("%Y%m%d")
     dir_path = Path(settings.upload_dir) / date_dir
     dir_path.mkdir(parents=True, exist_ok=True)

@@ -1,6 +1,7 @@
 <!--pages/overview/overview.wxml 物品总览：物品+标签+位置+数量+入库时间+到期日期，临近到期告警，有照片可点击查看-->
-<navigation-bar title="物品总览" back="{{true}}" color="black" background="#FFF"></navigation-bar>
-<scroll-view class="scrollarea" scroll-y type="list" refresher-enabled="{{true}}" bindrefresherrefresh="onPullDownRefresh">
+<navigation-bar title="物品总览" back="{{true}}" backAsHome="{{true}}" color="black" background="#FFF"></navigation-bar>
+<!-- <navigation-bar title="物品总览" back="{{true}}" color="black" background="#FFF"></navigation-bar> -->
+<scroll-view class="scrollarea" scroll-y refresher-enabled="{{true}}" bindrefresherrefresh="onPullDownRefresh">
   <view class="container">
     <view class="list" wx:if="{{list.length > 0}}">
       <view class="item {{item.expiryWarning ? 'item-warning' : ''}}" wx:for="{{list}}" wx:key="id">
@@ -19,7 +20,7 @@
           </view>
         </view>
         <view class="item-right">
-          <text class="row-qty">×{{item.quantity}}</text>
+          <text class="row-qty">×{{item.quantity}}</text><text wx:if="{{item.unit}}"> {{item.unit}}</text>
           <text class="row-alarm" wx:if="{{item.expiryWarning}}">即将过期</text>
         </view>
       </view>

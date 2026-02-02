@@ -2,31 +2,6 @@
 const storage = require("../../utils/storage");
 const api = require("../../utils/api");
 
-// 到期日期选项：从后端 config.expiry 解析，逗号分隔，单位为月（如 "1,3,6" 或 [1,3,6]）
-function parseExpiryMonths(expiry) {
-  if (Array.isArray(expiry)) {
-    return expiry
-      .map((n) => Number(n))
-      .filter((n) => !Number.isNaN(n) && n > 0);
-  }
-  if (typeof expiry === "string") {
-    return expiry
-      .split(",")
-      .map((s) => Number(s.trim()))
-      .filter((n) => !Number.isNaN(n) && n > 0);
-  }
-  return [1, 3, 6];
-}
-
-function buildExpiryFromConfig(config) {
-  const months = parseExpiryMonths(config && config.expiry);
-  const arr = months.length ? months : [1, 3, 6];
-  return {
-    expiryOptions: arr.map((m) => `${m}个月`),
-    expiryMonths: arr,
-  };
-}
-
 // 到期提醒选项：从后端 config.expiryWarningDays 解析，逗号分隔，单位为天（如 "3,7" 或 [3,7]）
 function parseReminderDays(expiryWarningDays) {
   if (Array.isArray(expiryWarningDays)) {
@@ -105,12 +80,14 @@ Page({
     typeIndex: 0,
     customType: "",
     showCustomInput: false,
-    expiryOptions: ["1个月", "3个月"],
-    expiryMonths: [1, 3],
+    units: [...(storage.UNIT || ["袋", "瓶", "箱", "斤", "个"]), "自定义"],
+    unitIndex: 0,
+    customUnit: "",
+    showCustomUnitInput: false,
     reminderOptions: ["3天", "7天"],
     reminderDays: [3, 7],
-    expiryIndex: 0,
     productionDate: "",
+    expiryDate: "",
     quantity: "",
     tagColors: TAG_COLORS,
     tagIndex: -1,
@@ -133,19 +110,27 @@ Page({
           : typeof types === "string"
           ? types.split(",").map((s) => s.trim())
           : storage.ITEM_TYPES;
-        const expiry = buildExpiryFromConfig(config);
         const reminder = buildReminderFromConfig(config);
+        const unitList = (config && config.unit) ||
+          storage.UNIT || ["袋", "瓶", "箱", "斤", "个"];
+        const unitArr = Array.isArray(unitList)
+          ? unitList
+          : typeof unitList === "string"
+          ? unitList.split(",").map((s) => s.trim())
+          : storage.UNIT || ["袋", "瓶", "箱", "斤", "个"];
         this.setData({
           itemTypes: [...list, "自定义"],
-          ...expiry,
+          units: [...unitArr, "自定义"],
           ...reminder,
         });
       })
       .catch(() => {
         this.setData({
           itemTypes: [...storage.ITEM_TYPES, "自定义"],
-          expiryOptions: ["1个月", "3个月"],
-          expiryMonths: [1, 3],
+          units: [
+            ...(storage.UNIT || ["袋", "瓶", "箱", "斤", "个"]),
+            "自定义",
+          ],
           reminderOptions: ["3天", "7天"],
           reminderDays: [3, 7],
         });
@@ -236,9 +221,23 @@ Page({
     this.setData({ customType: e.detail.value.trim() });
   },
 
-  // 到期日期选择（1个月/3个月）
-  onExpiryChange(e) {
-    this.setData({ expiryIndex: Number(e.detail.value) });
+  // 单位选择
+  onUnitChange(e) {
+    const idx = Number(e.detail.value);
+    this.setData({
+      unitIndex: idx,
+      showCustomUnitInput: idx === this.data.units.length - 1,
+    });
+  },
+
+  // 自定义单位输入
+  onCustomUnitInput(e) {
+    this.setData({ customUnit: e.detail.value.trim() });
+  },
+
+  // 到期日期选择（日期选择器）
+  onExpiryDateChange(e) {
+    this.setData({ expiryDate: e.detail.value });
   },
 
   // 到期提醒选择（还有几天过期时提醒：3天/7天）
@@ -271,16 +270,22 @@ Page({
     this.setData({ locationIndex: Number(e.detail.value) });
   },
 
-  // 拍照
+  // 拍照：压缩后仅存 path，提交时再上传
   onTakePhoto() {
     wx.chooseMedia({
       count: 1,
       mediaType: ["image"],
       sourceType: ["camera", "album"],
       camera: "back",
+      sizeType: ["compressed"],
       success: (res) => {
         const tempPath = res.tempFiles[0].tempFilePath;
-        this.setData({ photoPath: tempPath });
+        wx.compressImage({
+          src: tempPath,
+          quality: 20,
+          success: (r) => this.setData({ photoPath: r.tempFilePath }),
+          fail: () => this.setData({ photoPath: tempPath }),
+        });
       },
     });
   },
@@ -290,25 +295,59 @@ Page({
     this.setData({ photoPath: "" });
   },
 
+  /** 获取入库用的图片 URL，失败时弹窗。返回 Promise<string> 成功时为 url，失败且用户选「不带图片」为 ""，用户取消为 null */
+  getPhotoUrlForSubmit() {
+    const { photoPath } = this.data;
+    if (!photoPath) return Promise.resolve("");
+
+    const loadStart = Date.now();
+    wx.showLoading({ title: "上传中...", mask: true });
+
+    return api
+      .uploadImage(photoPath)
+      .then((url) => {
+        wx.hideLoading();
+        // wx.showToast({ title: "url:" + url, icon: "none" });
+        // console.log("getPhotoUrlForSubmit url:", url);
+        return url;
+      })
+      .catch((e) => {
+        wx.hideLoading();
+        wx.showToast({
+          title: "" + e,
+          icon: "none",
+        });
+        if (e.message === "未登录或登录已过期")
+          wx.reLaunch({ url: "/pages/login/login" });
+        return null;
+      });
+  },
+
   // 提交入库
-  onSubmit() {
+  async onSubmit() {
+    // 1. 从 data 取出表单字段
     const {
       inboundDateTime,
       itemTypes,
       typeIndex,
       customType,
       showCustomInput,
-      expiryIndex,
+      units,
+      unitIndex,
+      customUnit,
+      showCustomUnitInput,
       reminderIndex,
+      reminderDays,
       productionDate,
+      expiryDate,
       quantity,
       tagIndex,
       tagColors,
       locationIndex,
       locationOptions,
-      photoPath,
     } = this.data;
 
+    // 2. 校验必填项
     if (!inboundDateTime) {
       wx.showToast({ title: "请选择入库时间", icon: "none" });
       return;
@@ -323,6 +362,15 @@ Page({
       }
     }
 
+    let unit = units[unitIndex];
+    if (showCustomUnitInput) {
+      unit = customUnit.trim();
+      if (!unit) {
+        wx.showToast({ title: "请输入单位", icon: "none" });
+        return;
+      }
+    }
+
     if (!quantity || Number(quantity) <= 0) {
       wx.showToast({ title: "请输入有效的正数数量", icon: "none" });
       return;
@@ -333,35 +381,38 @@ Page({
       wx.showToast({ title: "数量必须为正整数", icon: "none" });
       return;
     }
-    console.log(tagIndex);
     if (tagIndex == -1) {
       wx.showToast({ title: "请选择标签颜色", icon: "none" });
       return;
     }
 
-    const inboundDate = new Date(inboundDateTime.replace(/-/g, "/"));
+    // 3. 构建请求体
     const inboundDateStr = inboundDateTime.slice(0, 10); // YYYY-MM-DD
-    const expiryMonths = this.data.expiryMonths || [1, 3];
-    const months =
-      expiryMonths[expiryIndex] != null
-        ? expiryMonths[expiryIndex]
-        : expiryMonths[0];
-    const expiryDate = new Date(inboundDate);
-    expiryDate.setMonth(expiryDate.getMonth() + months);
-    const expiryDateStr = storage.formatDate(expiryDate);
+    if (!expiryDate) {
+      wx.showToast({ title: "请选择到期日期", icon: "none" });
+      return;
+    }
+    const expiryDateStr = expiryDate;
 
+    const expiryWarningDays =
+      reminderDays && reminderDays[reminderIndex] != null
+        ? reminderDays[reminderIndex]
+        : null;
     const body = {
       itemType,
+      unit: unit || "",
       quantity: numQty,
       expiryDate: expiryDateStr,
       inboundDate: inboundDateStr,
       productionDate: productionDate || "",
+      expiryWarningDays,
       tag: tagIndex >= 0 ? tagColors[tagIndex] : "",
       location: locationIndex > 0 ? locationOptions[locationIndex] : "",
       photo: "",
     };
 
     const doPost = (photoUrl) => {
+      // console.log("doPost photoUrl:", photoUrl);
       body.photo = photoUrl || "";
       api
         .postInbound(body)
@@ -382,16 +433,22 @@ Page({
                   : typeof types === "string"
                   ? types.split(",").map((s) => s.trim())
                   : storage.ITEM_TYPES;
-                const expiry = buildExpiryFromConfig(config);
                 const reminder = buildReminderFromConfig(config);
+                const unitList = (config && config.unit) ||
+                  storage.UNIT || ["袋", "瓶", "箱", "斤", "个"];
+                const unitArr = Array.isArray(unitList)
+                  ? unitList
+                  : typeof unitList === "string"
+                  ? unitList.split(",").map((s) => s.trim())
+                  : storage.UNIT || ["袋", "瓶", "箱", "斤", "个"];
                 this.setData({
                   itemTypes: [...list, "自定义"],
-                  ...expiry,
+                  units: [...unitArr, "自定义"],
                   ...reminder,
                 });
               })
               .catch(() => {});
-            setTimeout(() => this.resetForm(), 1500);
+            setTimeout(() => this.resetForm(), 10000);
             wx.switchTab({ url: "/pages/index/index" });
           } else {
             wx.showToast({ title: res.message || "入库失败", icon: "none" });
@@ -404,21 +461,18 @@ Page({
         });
     };
 
-    if (photoPath) {
-      wx.showLoading({ title: "上传中..." });
-      api
-        .uploadImage(photoPath)
-        .then((url) => {
-          wx.hideLoading();
-          doPost(url);
-        })
-        .catch((e) => {
-          wx.hideLoading();
-          wx.showToast({ title: e.message || "图片上传失败", icon: "none" });
-        });
-    } else {
-      doPost("");
-    }
+    // 5. 获取图片 URL（有图则上传，失败可选不带图入库），用户取消则返回
+    const photoUrl = await this.getPhotoUrlForSubmit();
+    // wx.showToast("photoUrl:", photoUrl);
+    // wx.showToast({
+    //   title: `photoUrl: ${photoUrl}`,
+    //   icon: "none", // 不显示图标，只显示文字
+    //   duration: 10000, // 10秒 = 10000毫秒
+    //   mask: true, // 防止触摸穿透（可选）
+    // });
+    // console.log("photoUrl:", photoUrl);
+    // if (photoUrl === null) return;
+    doPost(photoUrl);
   },
 
   resetForm() {
@@ -429,9 +483,12 @@ Page({
       typeIndex: 0,
       showCustomInput: false,
       customType: "",
-      expiryIndex: 0,
+      unitIndex: 0,
+      showCustomUnitInput: false,
+      customUnit: "",
       reminderIndex: 1,
       productionDate: "",
+      expiryDate: "",
       quantity: "",
       tagIndex: -1,
       locationIndex: 0,

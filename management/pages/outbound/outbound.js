@@ -21,7 +21,13 @@ Page({
   loadList() {
     api
       .getOutboundList()
-      .then((list) => this.setData({ list: list || [] }))
+      .then((list) => {
+        const items = (list || []).map((it) => ({
+          ...it,
+          displayUnit: it.unit || "个",
+        }));
+        this.setData({ list: items });
+      })
       .catch((e) => {
         if (e.message === "未登录或登录已过期")
           wx.reLaunch({ url: "/pages/login/login" });
@@ -41,6 +47,8 @@ Page({
       itemType: item.itemType,
       tag: item.tag,
       quantity: item.quantity,
+      unit: item.unit || "",
+      displayUnit: item.displayUnit || item.unit || "个",
     };
     this.setData({
       outboundItem,

@@ -27,29 +27,9 @@
         <input class="form-input" placeholder="请输入物品类型" value="{{customType}}" bindinput="onCustomTypeInput" />
       </view>
 
-      <!-- 到期日期：物品多长时间后过期（1个月/3个月） -->
-      <view class="form-item">
-        <text class="form-label">到期日期</text>
-        <picker mode="selector" range="{{expiryOptions}}" value="{{expiryIndex}}" bindchange="onExpiryChange">
-          <view class="picker-value">
-            <text>{{expiryOptions[expiryIndex]}}</text>
-            <text class="picker-arrow">></text>
-          </view>
-        </picker>
-      </view>
+      
 
-      <!-- 到期提醒：还有多少天过期时提醒（3天/7天） -->
-      <view class="form-item">
-        <text class="form-label">到期提醒</text>
-        <picker mode="selector" range="{{reminderOptions}}" value="{{reminderIndex}}" bindchange="onReminderChange">
-          <view class="picker-value">
-            <text>{{reminderOptions[reminderIndex]}}</text>
-            <text class="picker-arrow">></text>
-          </view>
-        </picker>
-      </view>
-
-      <!-- 生产日期（选填） -->
+       <!-- 生产日期（选填） -->
       <view class="form-item">
         <text class="form-label">生产日期<text class="optional">选填</text></text>
         <picker mode="date" value="{{productionDate}}" bindchange="onProductionDateChange">
@@ -60,10 +40,49 @@
         </picker>
       </view>
 
+      <!-- 到期日期：与生产日期一样使用日期选择器 -->
+      <view class="form-item">
+        <text class="form-label">到期日期</text>
+        <picker mode="date" value="{{expiryDate}}" bindchange="onExpiryDateChange">
+          <view class="picker-value">
+            <text class="{{expiryDate ? '' : 'placeholder'}}">{{expiryDate || '请选择'}}</text>
+            <text class="picker-arrow">></text>
+          </view>
+        </picker>
+      </view>
+
+      <!-- 到期提醒：还有多少天过期时提醒（3天/7天） -->
+      <view class="form-item">
+        <text class="form-label">到期前提醒</text>
+        <picker mode="selector" range="{{reminderOptions}}" value="{{reminderIndex}}" bindchange="onReminderChange">
+          <view class="picker-value">
+            <text>{{reminderOptions[reminderIndex]}}</text>
+            <text class="picker-arrow">></text>
+          </view>
+        </picker>
+      </view>
+
+     
+
       <!-- 数量：仅数字、仅正数 -->
       <view class="form-item">
         <text class="form-label">数量</text>
         <input class="form-input" type="digit" inputmode="numeric" placeholder="请输入正整数" value="{{quantity}}" bindinput="onQuantityInput" />
+      </view>
+
+      <!-- 单位：选择或自定义 -->
+      <view class="form-item">
+        <text class="form-label">单位</text>
+        <picker mode="selector" range="{{units}}" value="{{unitIndex}}" bindchange="onUnitChange">
+          <view class="picker-value">
+            <text>{{units[unitIndex]}}</text>
+            <text class="picker-arrow">></text>
+          </view>
+        </picker>
+      </view>
+      <view class="form-item custom-type-item" wx:if="{{showCustomUnitInput}}">
+        <text class="form-label">自定义单位</text>
+        <input class="form-input" placeholder="请输入单位" value="{{customUnit}}" bindinput="onCustomUnitInput" />
       </view>
 
       <!-- 标签选择（颜色） -->

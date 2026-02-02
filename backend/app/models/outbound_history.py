@@ -11,6 +11,7 @@ class OutboundHistory(Base):
     id = Column(BigInteger, primary_key=True, autoincrement=True)
     user_id = Column(BigInteger, nullable=False, index=True)
     item_type = Column(String(64), nullable=False, index=True)
+    unit = Column(String(32), nullable=True, default="")
     quantity = Column(Integer, nullable=False)
     outbound_date = Column(Date, nullable=False)
     tag = Column(String(16), nullable=True, default="")

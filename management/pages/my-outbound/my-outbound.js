@@ -20,7 +20,11 @@ Page({
     api
       .getMyOutbound(this.data.page, this.data.limit)
       .then(({ items, hasMore }) => {
-        const list = this.data.page === 1 ? items : [...this.data.list, ...items];
+        const mapped = (items || []).map((it) => ({
+          ...it,
+          displayUnit: it.unit || "个",
+        }));
+        const list = this.data.page === 1 ? mapped : [...this.data.list, ...mapped];
         this.setData({
           list,
           page: this.data.page + 1,

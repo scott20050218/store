@@ -16,6 +16,7 @@ def get_config(
 ):
     data = {
         "itemTypes": get_config_value(db, "ITEM_TYPES"),
+        "unit": get_config_value(db, "UNIT"),
         "lowStockThreshold": get_config_value(db, "LOW_STOCK_THRESHOLD"),
         "expiryWarningDays": get_config_value(db, "EXPIRY_WARNING_DAYS"),
         "expiry": get_config_value(db, "EXPIRY"),

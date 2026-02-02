@@ -1,6 +1,7 @@
 /**index.wxss**/
 .scrollarea {
   height: 100vh;
+  box-sizing: border-box;
   background: linear-gradient(135deg, #5ec9db 0%, #fdc765, 100%);
 }
 

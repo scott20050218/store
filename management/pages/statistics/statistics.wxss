@@ -73,7 +73,7 @@
 .col-in,
 .col-out,
 .col-net {
-  width: 80rpx;
+  width: 180rpx;
   text-align: right;
 }
 
@@ -88,6 +88,19 @@
 }
 
 .col-net:not(.net-positive):not(.net-negative) {
+  color: #999;
+}
+
+.io-stats-loading {
+  padding: 40rpx;
+  text-align: center;
+  background: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 30rpx;
+}
+
+.io-stats-loading-text {
+  font-size: 28rpx;
   color: #999;
 }
 
@@ -175,6 +188,19 @@
   font-size: 32rpx;
   font-weight: bold;
   color: #333;
+}
+
+/* 明细加载中 */
+.detail-loading {
+  padding: 40rpx;
+  text-align: center;
+  background: #fff;
+  border-radius: 16rpx;
+}
+
+.detail-loading-text {
+  font-size: 28rpx;
+  color: #999;
 }
 
 /* 库存明细列表 */

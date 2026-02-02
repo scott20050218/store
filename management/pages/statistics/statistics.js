@@ -20,6 +20,9 @@ function getToday() {
 Page({
   data: {
     ioStats: [],
+    loading: false,
+    detailLoading: false,
+    refreshing: false,
     startDate: getMonthStart(),
     endDate: getToday(),
     detailMode: "",
@@ -63,15 +66,36 @@ Page({
       detailMode: detailType,
       detailItemType: itemType,
       detailTitle,
+      detailLoading: true,
+      detailList: [],
     });
     api
       .getInventoryIODetails(itemType, startDate, endDate, detailType)
-      .then((detailList) => {
-        this.setData({ detailList, scrollIntoView: "detailSection" });
-        setTimeout(() => this.setData({ scrollIntoView: "" }), 300);
+      .then((res) => {
+        const raw = Array.isArray(res) ? res : [];
+        const list = raw.map((item, i) => ({
+          ...item,
+          displayUnit: item.unit || "个",
+          _key: `${item.date || ""}-${item.type || ""}-${i}`,
+        }));
+        this.setData(
+          {
+            detailList: list,
+            detailLoading: false,
+            scrollIntoView: "detailSection",
+          },
+          () => {
+            setTimeout(() => this.setData({ scrollIntoView: "" }), 300);
+          }
+        );
       })
       .catch((err) => {
-        wx.showToast({ title: err.message || "加载失败", icon: "none" });
+        this.setData({ detailLoading: false });
+        wx.showToast({
+          title: err.message || "加载失败，设备较慢请重试",
+          icon: "none",
+          duration: 3000,
+        });
         this.setData({
           detailMode: "",
           detailItemType: "",
@@ -93,23 +117,42 @@ Page({
   loadIOStats() {
     const { startDate, endDate } = this.data;
     this.setData({
+      loading: true,
       detailMode: "",
       detailItemType: "",
       detailList: [],
       detailTitle: "",
     });
-    api
+    return api
       .getInventoryIOStats(startDate, endDate)
-      .then((ioStats) => this.setData({ ioStats }))
+      .then((res) => {
+        const raw = Array.isArray(res) ? res : [];
+        const ioStats = raw.map((item, i) => ({
+          ...item,
+          _key: item.itemType ? `${item.itemType}-${i}` : `row-${i}`,
+        }));
+        this.setData({ ioStats, loading: false });
+        console.log("this.data:", this.data);
+      })
       .catch((e) => {
+        this.setData({ loading: false });
         if (e.message === "未登录或登录已过期")
           wx.reLaunch({ url: "/pages/login/login" });
-        else wx.showToast({ title: e.message || "加载失败", icon: "none" });
+        else
+          wx.showToast({
+            title: (e.message || "加载失败") + "，设备较慢可下拉重试",
+            icon: "none",
+            duration: 3000,
+          });
       });
   },
 
   onPullDownRefresh() {
-    this.loadIOStats();
-    wx.stopPullDownRefresh();
+    this.setData({ refreshing: true });
+    const done = () => {
+      this.setData({ refreshing: false });
+      wx.stopPullDownRefresh();
+    };
+    this.loadIOStats().then(done).catch(done);
   },
 });

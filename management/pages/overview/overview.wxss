@@ -1,12 +1,16 @@
 /**pages/overview/overview.wxss 物品总览：物品+标签+位置+数量+入库时间+到期日期，告警样式，照片链接*/
 .scrollarea {
-  height: 100vh;
+  /* 减去导航栏高度(约44-48px+安全区)，避免总高度超出视口导致底部被裁切 */
+  /*height: calc(100vh - 48px - constant(safe-area-inset-top));
+  height: calc(100vh - 48px - env(safe-area-inset-top));*/
   background: #f5f5f5;
+  box-sizing: border-box;
 }
 
 .container {
   padding: 30rpx;
-  padding-bottom: 60rpx;
+  padding-bottom: calc(80rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(80rpx + env(safe-area-inset-bottom));
 }
 
 .list {

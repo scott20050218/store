@@ -9,6 +9,7 @@ class InventoryRecord(Base):
 
     id = Column(String(36), primary_key=True)
     item_type = Column(String(64), nullable=False, index=True)
+    unit = Column(String(32), nullable=True, default="")
     quantity = Column(Integer, nullable=False)
     expiry_date = Column(Date, nullable=False)
     inbound_date = Column(Date, nullable=False)
@@ -16,4 +17,5 @@ class InventoryRecord(Base):
     tag = Column(String(16), nullable=True, default="")
     location = Column(String(64), nullable=True, default="")
     photo = Column(String(512), nullable=True, default="")
+    expiry_warning_days = Column(Integer, nullable=True, default=None)
     create_time = Column(DateTime, server_default=func.now())

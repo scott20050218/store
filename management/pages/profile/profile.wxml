@@ -77,7 +77,7 @@
 
     <!-- 版本信息 -->
     <view class="version-info">
-      <text>仓库管理系统 v1.0.0</text>
+      <text>仓库管理系统 v1.0.10</text>
     </view>
   </view>
 </scroll-view>

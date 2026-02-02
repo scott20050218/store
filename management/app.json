@@ -1,4 +1,7 @@
 {
+  "networkTimeout": {
+    "uploadFile": 120000
+  },
   "permission": {
     "scope.album": {
       "desc": "用于选择入库物品图片"

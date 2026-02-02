@@ -22,16 +22,19 @@ Page({
   },
 
   loadList() {
-    api.getInventoryOverview()
+    api
+      .getInventoryOverview()
       .then((rawList) => {
         const list = (rawList || []).map((item) => ({
           ...item,
           photoUrl: toPhotoUrl(item.photo),
         }));
+        // console.log("list:", list);
         this.setData({ list });
       })
       .catch((e) => {
-        if (e.message === "未登录或登录已过期") wx.reLaunch({ url: "/pages/login/login" });
+        if (e.message === "未登录或登录已过期")
+          wx.reLaunch({ url: "/pages/login/login" });
         else wx.showToast({ title: e.message || "加载失败", icon: "none" });
       });
   },
