@@ -449,7 +449,7 @@ Page({
               })
               .catch(() => {});
             setTimeout(() => this.resetForm(), 10000);
-            wx.switchTab({ url: "/pages/index/index" });
+            // wx.switchTab({ url: "/pages/index/index" });
           } else {
             wx.showToast({ title: res.message || "入库失败", icon: "none" });
           }

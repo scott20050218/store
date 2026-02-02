@@ -12,8 +12,12 @@ router = APIRouter()
 _STATUS_VALUES = frozenset(("正常", "冻结", "删除", "已注册"))
 
 
+# 超级用户：用户名为 admin 或 李丽君
+_ADMIN_NAMES = frozenset(("admin", "李丽君"))
+
+
 def require_admin(current_user: User) -> None:
-    if current_user.name != "admin":
+    if current_user.name not in _ADMIN_NAMES:
         raise HTTPException(status_code=403, detail="仅管理员可操作")
 
 

@@ -72,9 +72,12 @@ def outbound_fifo(
     if total < quantity:
         return False, f"库存不足，当前库存: {total}"
     remaining = quantity
+    first_unit = ""
     first_tag = ""
     first_location = ""
     for r in records:
+        if not first_unit and r.unit:
+            first_unit = r.unit
         if not first_tag and r.tag:
             first_tag = r.tag
         if not first_location and r.location:
