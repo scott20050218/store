@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import re
 from fastapi import APIRouter, Depends, HTTPException
 
@@ -10,7 +11,6 @@ from sqlalchemy.orm import Session
 router = APIRouter()
 
 _STATUS_VALUES = frozenset(("正常", "冻结", "删除", "已注册"))
-
 
 # 超级用户：用户名为 admin 或 李丽君
 _ADMIN_NAMES = frozenset(("admin", "李丽君"))

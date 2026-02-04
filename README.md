@@ -148,3 +148,5 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 **admin 管理用户不可见**  
 需以 name 为 `admin` 的用户登录，且该用户已在 `init_data.py` 中预初始化（phone: 13800000000）。
+
+ ssh -i /Users/lihengrui/software/keys/ubuntu.pem -N -f -L localhost:3307:localhost:3306 root@122.51.48.186

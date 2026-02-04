@@ -39,7 +39,6 @@
 .io-stats-table {
   background: #fff;
   border-radius: 16rpx;
-  overflow: hidden;
   box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
   margin-bottom: 30rpx;
 }

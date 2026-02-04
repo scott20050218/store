@@ -235,7 +235,8 @@ function uploadImage(filePath) {
         if (res.statusCode >= 200 && res.statusCode < 300) {
           let data;
           try {
-            data = typeof res.data === "string" ? JSON.parse(res.data) : res.data;
+            data =
+              typeof res.data === "string" ? JSON.parse(res.data) : res.data;
           } catch (_) {
             reject(new Error("响应解析失败"));
             return;
@@ -248,7 +249,8 @@ function uploadImage(filePath) {
         } else {
           let msg = `服务器错误 ${res.statusCode}`;
           try {
-            const d = typeof res.data === "string" ? JSON.parse(res.data) : res.data;
+            const d =
+              typeof res.data === "string" ? JSON.parse(res.data) : res.data;
             if (d && d.message) msg = d.message;
           } catch (_) {}
           reject(new Error(msg));
