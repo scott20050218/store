@@ -9,7 +9,7 @@
           <view class="row-name-wrap">
             <text class="row-name">{{item.itemType}}</text>
             <text class="row-location" wx:if="{{item.location}}">位置：{{item.location}}</text>
-            <view class="row-tag" wx:if="{{item.tag}}" style="background-color: {{item.tag}}"></view>
+            <text class="row-tag" wx:if="{{item.tag}}">标签：{{item.tag}}</text>
           </view>
           <view class="row-meta">
             <text class="row-meta-item">入库：{{item.inboundDate || '无'}}</text>

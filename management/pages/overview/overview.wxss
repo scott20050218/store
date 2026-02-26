@@ -1,8 +1,8 @@
 /**pages/overview/overview.wxss 物品总览：物品+标签+位置+数量+入库时间+到期日期，告警样式，照片链接*/
 .scrollarea {
   /* 减去导航栏高度(约44-48px+安全区)，避免总高度超出视口导致底部被裁切 */
-  /*height: calc(100vh - 48px - constant(safe-area-inset-top));
-  height: calc(100vh - 48px - env(safe-area-inset-top));*/
+  height: calc(100vh - 48px - constant(safe-area-inset-top));
+  height: calc(100vh - 48px - env(safe-area-inset-top));
   background: #f5f5f5;
   box-sizing: border-box;
 }
@@ -50,21 +50,19 @@
 }
 
 .row-name {
-  font-size: 32rpx;
+  font-size: 36rpx;
   font-weight: 500;
   color: #333;
 }
 
 .row-location {
-  font-size: 24rpx;
+  font-size: 28rpx;
   color: #666;
 }
 
 .row-tag {
-  width: 24rpx;
-  height: 24rpx;
-  border-radius: 6rpx;
-  flex-shrink: 0;
+  font-size: 28rpx;
+  color: #666;
 }
 
 .row-meta {
@@ -75,7 +73,7 @@
 }
 
 .row-meta-item {
-  font-size: 24rpx;
+  font-size: 28rpx;
   color: #666;
 }
 
@@ -84,7 +82,7 @@
 }
 
 .photo-link {
-  font-size: 26rpx;
+  font-size: 30rpx;
   color: #1989fa;
   text-decoration: underline;
 }
@@ -97,14 +95,14 @@
 }
 
 .row-qty {
-  font-size: 32rpx;
+  font-size: 36rpx;
   font-weight: 500;
   color: #333;
   margin-bottom: 6rpx;
 }
 
 .row-alarm {
-  font-size: 22rpx;
+  font-size: 26rpx;
   color: #de0012;
   background: rgba(222, 0, 18, 0.1);
   padding: 4rpx 12rpx;
@@ -125,12 +123,12 @@
 }
 
 .empty-text {
-  font-size: 32rpx;
+  font-size: 36rpx;
   color: #666;
   margin-bottom: 10rpx;
 }
 
 .empty-hint {
-  font-size: 26rpx;
+  font-size: 30rpx;
   color: #999;
 }

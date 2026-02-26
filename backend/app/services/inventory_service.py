@@ -197,7 +197,7 @@ def get_overview(db: Session) -> List[dict]:
 
 
 def get_outbound_list(db: Session) -> List[dict]:
-    """物品+标签+数量+单位"""
+    """物品+标签+数量+单位+位置"""
     records = get_all_records(db)
     return [
         {
@@ -206,6 +206,7 @@ def get_outbound_list(db: Session) -> List[dict]:
             "tag": r.tag or "",
             "quantity": r.quantity,
             "unit": r.unit or "",
+            "location": r.location or "",
         }
         for r in records
     ]

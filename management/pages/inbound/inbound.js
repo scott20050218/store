@@ -52,16 +52,16 @@ function buildDateTimeColumns() {
   for (let y = now.getFullYear() - 1; y <= now.getFullYear() + 2; y++)
     years.push(String(y));
   const months = Array.from({ length: 12 }, (_, i) =>
-    String(i + 1).padStart(2, "0")
+    String(i + 1).padStart(2, "0"),
   );
   const days = Array.from({ length: 31 }, (_, i) =>
-    String(i + 1).padStart(2, "0")
+    String(i + 1).padStart(2, "0"),
   );
   const hours = Array.from({ length: 24 }, (_, i) =>
-    String(i).padStart(2, "0")
+    String(i).padStart(2, "0"),
   );
   const minutes = Array.from({ length: 60 }, (_, i) =>
-    String(i).padStart(2, "0")
+    String(i).padStart(2, "0"),
   );
   return [years, months, days, hours, minutes];
 }
@@ -108,16 +108,16 @@ Page({
         const list = Array.isArray(types)
           ? types
           : typeof types === "string"
-          ? types.split(",").map((s) => s.trim())
-          : storage.ITEM_TYPES;
+            ? types.split(",").map((s) => s.trim())
+            : storage.ITEM_TYPES;
         const reminder = buildReminderFromConfig(config);
         const unitList = (config && config.unit) ||
           storage.UNIT || ["袋", "瓶", "箱", "斤", "个"];
         const unitArr = Array.isArray(unitList)
           ? unitList
           : typeof unitList === "string"
-          ? unitList.split(",").map((s) => s.trim())
-          : storage.UNIT || ["袋", "瓶", "箱", "斤", "个"];
+            ? unitList.split(",").map((s) => s.trim())
+            : storage.UNIT || ["袋", "瓶", "箱", "斤", "个"];
         this.setData({
           itemTypes: [...list, "自定义"],
           units: [...unitArr, "自定义"],
@@ -195,7 +195,7 @@ Page({
       const month = Number(cols[1][val[1]]);
       const dayMax = getDaysInMonth(year, month);
       cols[2] = Array.from({ length: dayMax }, (_, i) =>
-        String(i + 1).padStart(2, "0")
+        String(i + 1).padStart(2, "0"),
       );
       if (val[2] >= dayMax) val[2] = dayMax - 1;
       this.setData({
@@ -382,7 +382,12 @@ Page({
       return;
     }
     if (tagIndex == -1) {
-      wx.showToast({ title: "请选择标签颜色", icon: "none" });
+      wx.showToast({ title: "请选择标签", icon: "none" });
+      return;
+    }
+
+    if (locationIndex == 0) {
+      wx.showToast({ title: "请选择位置", icon: "none" });
       return;
     }
 
@@ -406,7 +411,7 @@ Page({
       inboundDate: inboundDateStr,
       productionDate: productionDate || "",
       expiryWarningDays,
-      tag: tagIndex >= 0 ? tagColors[tagIndex] : "",
+      tag: tagIndex >= 0 ? String(tagIndex + 1) : "",
       location: locationIndex > 0 ? locationOptions[locationIndex] : "",
       photo: "",
     };
@@ -431,16 +436,16 @@ Page({
                 const list = Array.isArray(types)
                   ? types
                   : typeof types === "string"
-                  ? types.split(",").map((s) => s.trim())
-                  : storage.ITEM_TYPES;
+                    ? types.split(",").map((s) => s.trim())
+                    : storage.ITEM_TYPES;
                 const reminder = buildReminderFromConfig(config);
                 const unitList = (config && config.unit) ||
                   storage.UNIT || ["袋", "瓶", "箱", "斤", "个"];
                 const unitArr = Array.isArray(unitList)
                   ? unitList
                   : typeof unitList === "string"
-                  ? unitList.split(",").map((s) => s.trim())
-                  : storage.UNIT || ["袋", "瓶", "箱", "斤", "个"];
+                    ? unitList.split(",").map((s) => s.trim())
+                    : storage.UNIT || ["袋", "瓶", "箱", "斤", "个"];
                 this.setData({
                   itemTypes: [...list, "自定义"],
                   units: [...unitArr, "自定义"],

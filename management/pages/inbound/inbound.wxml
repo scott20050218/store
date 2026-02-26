@@ -6,7 +6,7 @@
     <view class="form-card">
       <!-- 入库时间：仅显示当前时间，不可编辑 -->
       <view class="form-item">
-        <text class="form-label">入库时间</text>
+        <text class="form-label">入库时间<text class="required">*</text></text>
         <view class="form-value-readonly">
           <text>{{inboundDateTime || '--'}}</text>
         </view>
@@ -14,7 +14,7 @@
 
       <!-- 物品类型：选择或自定义 -->
       <view class="form-item">
-        <text class="form-label">物品类型</text>
+        <text class="form-label">物品类型<text class="required">*</text></text>
         <picker mode="selector" range="{{itemTypes}}" value="{{typeIndex}}" bindchange="onTypeChange">
           <view class="picker-value">
             <text>{{itemTypes[typeIndex]}}</text>
@@ -42,7 +42,7 @@
 
       <!-- 到期日期：与生产日期一样使用日期选择器 -->
       <view class="form-item">
-        <text class="form-label">到期日期</text>
+        <text class="form-label">到期日期<text class="required">*</text></text>
         <picker mode="date" value="{{expiryDate}}" bindchange="onExpiryDateChange">
           <view class="picker-value">
             <text class="{{expiryDate ? '' : 'placeholder'}}">{{expiryDate || '请选择'}}</text>
@@ -66,13 +66,13 @@
 
       <!-- 数量：仅数字、仅正数 -->
       <view class="form-item">
-        <text class="form-label">数量</text>
+        <text class="form-label">数量<text class="required">*</text></text>
         <input class="form-input" type="digit" inputmode="numeric" placeholder="请输入正整数" value="{{quantity}}" bindinput="onQuantityInput" />
       </view>
 
       <!-- 单位：选择或自定义 -->
       <view class="form-item">
-        <text class="form-label">单位</text>
+        <text class="form-label">单位<text class="required">*</text></text>
         <picker mode="selector" range="{{units}}" value="{{unitIndex}}" bindchange="onUnitChange">
           <view class="picker-value">
             <text>{{units[unitIndex]}}</text>
@@ -87,14 +87,13 @@
 
       <!-- 标签选择（颜色） -->
       <view class="form-item form-item-col">
-        <text class="form-label">标签</text>
+        <text class="form-label">标签<text class="required">*</text></text>
         <view class="tag-list">
           <view
             class="tag-item {{tagIndex === index ? 'selected' : ''}}"
             wx:for="{{tagColors}}"
             wx:key="index"
             data-index="{{index}}"
-            style="background-color: {{item}}"
             bindtap="onTagSelect"
           >
             <text class="tag-num">{{index + 1}}</text>
@@ -104,7 +103,7 @@
 
       <!-- 位置选择 -->
       <view class="form-item">
-        <text class="form-label">位置</text>
+        <text class="form-label">位置<text class="required">*</text></text>
         <picker mode="selector" range="{{locationOptions}}" value="{{locationIndex}}" bindchange="onLocationChange">
           <view class="picker-value">
             <text class="{{locationIndex > 0 ? '' : 'placeholder'}}">{{locationOptions[locationIndex]}}</text>

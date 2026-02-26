@@ -12,9 +12,10 @@
         <view class="item-main">
           <view class="item-name-row">
             <text class="item-name">{{item.itemType}}</text>
-            <view class="item-tag" wx:if="{{item.tag}}" style="background-color: {{item.tag}}"></view>
+            <view class="item-tag" wx:if="{{item.tag}}">标签：{{item.tag}}</view>
           </view>
           <text class="item-qty">数量: {{item.quantity}} {{item.displayUnit}}</text>
+          <text class="item-location">位置: {{item.location}}</text>
         </view>
         <view class="item-action" data-index="{{index}}" bindtap="onOutboundTap">
           <text>出库</text>
@@ -38,7 +39,7 @@
     <view class="modal-item" wx:if="{{outboundItem}}">
       <text class="modal-label">物品：</text>
       <text class="modal-value">{{outboundItem.itemType}}</text>
-      <view class="modal-tag" wx:if="{{outboundItem.tag}}" style="background-color: {{outboundItem.tag}}"></view>
+      <view class="modal-tag" wx:if="{{outboundItem.tag}}">标签: {{outboundItem.tag}}</view>
     </view>
     <view class="modal-item">
       <text class="modal-label">可出库：</text>

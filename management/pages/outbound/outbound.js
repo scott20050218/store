@@ -49,6 +49,7 @@ Page({
       quantity: item.quantity,
       unit: item.unit || "",
       displayUnit: item.displayUnit || item.unit || "个",
+      location: item.location || "",
     };
     this.setData({
       outboundItem,
