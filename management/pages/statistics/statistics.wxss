@@ -170,6 +170,7 @@
 }
 
 .detail-date,
+.detail-create-time,
 .detail-user,
 .detail-location,
 .detail-expiry {

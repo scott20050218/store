@@ -49,6 +49,7 @@
         <view class="detail-left">
           <text class="detail-type">{{item.type === 'inbound' ? '入库' : '出库'}}</text>
           <text class="detail-date">{{item.date}}</text>
+          <text class="detail-create-time" wx:if="{{item.createTime}}">创建时间：{{item.createTime}}</text>
           <text class="detail-user" wx:if="{{item.userName}}">操作人：{{item.userName}}</text>
           <text class="detail-location" wx:if="{{item.location}}">货架：{{item.location}}</text>
           <text class="detail-expiry" wx:if="{{item.expiryDate}}">到期：{{item.expiryDate}}</text>

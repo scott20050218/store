@@ -274,6 +274,7 @@ def get_io_details(
                 "tag": r.tag or "",
                 "itemType": r.item_type,
                 "userName": user_name or "",
+                "createTime": r.create_time.isoformat() if r.create_time else "",
             })
     if detail_type in ("outbound", "both"):
         rows = (
@@ -298,6 +299,7 @@ def get_io_details(
                 "tag": r.tag or "",
                 "itemType": r.item_type,
                 "userName": user_name or "",
+                "createTime": r.create_time.isoformat() if r.create_time else "",
             })
     if detail_type == "both":
         result.sort(key=lambda x: (x["date"], x["type"]), reverse=True)
