@@ -97,7 +97,7 @@
             style="background-color: {{item}}"
             bindtap="onTagSelect"
           >
-            <text class="tag-check" wx:if="{{tagIndex === index}}">✓</text>
+            <text class="tag-num">{{index + 1}}</text>
           </view>
         </view>
       </view>

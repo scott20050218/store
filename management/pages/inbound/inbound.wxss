@@ -118,16 +118,24 @@
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.tag-item:not(.selected) {
+  opacity: 0.6;
 }
 
 .tag-item.selected {
+  opacity: 1;
+  transform: scale(1.15);
+  border-width: 6rpx;
   border-color: #333;
-  box-shadow: 0 0 0 2rpx #fff;
+  box-shadow: 0 0 0 2rpx #fff, 0 4rpx 12rpx rgba(0, 0, 0, 0.25);
 }
 
-.tag-check {
+.tag-num {
   color: #fff;
-  font-size: 32rpx;
+  font-size: 28rpx;
   font-weight: bold;
   text-shadow: 0 1rpx 2rpx rgba(0, 0, 0, 0.5);
 }

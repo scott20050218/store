@@ -91,6 +91,7 @@ Page({
     const outboundDate = storage.formatDate(new Date());
     api
       .postOutbound({
+        id: outboundItem.id,
         itemType: outboundItem.itemType,
         quantity: qty,
         outboundDate,

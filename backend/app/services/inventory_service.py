@@ -56,6 +56,39 @@ def add_inbound(
     return record.id
 
 
+def outbound_by_id(
+    db: Session, user_id: int, record_id: str, quantity: int, outbound_date: str
+) -> tuple[bool, str]:
+    """Outbound by specific record ID. Returns (success, message)."""
+    record = db.query(InventoryRecord).filter(InventoryRecord.id == record_id).first()
+    if not record:
+        return False, "该物品记录不存在"
+    if record.quantity < quantity:
+        return False, f"库存不足，当前库存: {record.quantity}"
+    remaining = quantity
+    unit = record.unit or ""
+    tag = record.tag or ""
+    location = record.location or ""
+    if record.quantity <= remaining:
+        remaining -= record.quantity
+        db.delete(record)
+    else:
+        record.quantity -= remaining
+        remaining = 0
+    history = OutboundHistory(
+        user_id=user_id,
+        item_type=record.item_type,
+        quantity=quantity,
+        outbound_date=date.fromisoformat(outbound_date),
+        unit=unit,
+        tag=tag,
+        location=location,
+    )
+    db.add(history)
+    db.commit()
+    return True, "出库成功"
+
+
 def outbound_fifo(
     db: Session, user_id: int, item_type: str, quantity: int, outbound_date: str
 ) -> tuple[bool, str]:

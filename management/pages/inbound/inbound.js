@@ -43,7 +43,7 @@ const LOCATION_OPTIONS = [
 ];
 
 // 标签颜色
-const TAG_COLORS = ["#5ce9db", "#148838", "#DE0012", "#6462cc", "#CCA317"];
+const TAG_COLORS = ["#092D88", "#148838", "#DE0012", "#3A0A75", "#CCA317"];
 
 // 生成日期时间选择器列数据
 function buildDateTimeColumns() {
