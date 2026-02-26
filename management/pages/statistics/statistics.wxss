@@ -180,6 +180,14 @@
   margin-top: 6rpx;
 }
 
+.detail-expiry-warning {
+  display: block;
+  font-size: 26rpx;
+  color: #f5222d;
+  font-weight: 500;
+  margin-top: 6rpx;
+}
+
 .detail-right {
   margin-left: 20rpx;
 }

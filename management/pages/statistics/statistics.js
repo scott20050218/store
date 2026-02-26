@@ -8,6 +8,24 @@ function formatDate(d) {
   return `${y}-${m}-${day}`;
 }
 
+// 检查是否即将过期（7天内）
+function isExpiringSoon(expiryDate) {
+  if (!expiryDate) return false;
+  const today = new Date();
+  const expiry = new Date(expiryDate);
+  const diffTime = expiry - today;
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays <= 7 && diffDays >= 0;
+}
+
+// 检查是否已过期
+function isExpired(expiryDate) {
+  if (!expiryDate) return false;
+  const today = new Date();
+  const expiry = new Date(expiryDate);
+  return expiry < today;
+}
+
 function getMonthStart() {
   const d = new Date();
   return formatDate(new Date(d.getFullYear(), d.getMonth(), 1));
@@ -52,7 +70,7 @@ Page({
     const startDate = this.data.startDate;
     const newStartDate = endDate < startDate ? endDate : startDate;
     this.setData({ endDate, startDate: newStartDate }, () =>
-      this.loadIOStats()
+      this.loadIOStats(),
     );
   },
 
@@ -76,6 +94,8 @@ Page({
         const list = raw.map((item, i) => ({
           ...item,
           displayUnit: item.unit || "个",
+          isExpiring: isExpiringSoon(item.expiryDate),
+          isExpired: isExpired(item.expiryDate),
           _key: `${item.date || ""}-${item.type || ""}-${i}`,
         }));
         this.setData(
@@ -86,7 +106,7 @@ Page({
           },
           () => {
             setTimeout(() => this.setData({ scrollIntoView: "" }), 300);
-          }
+          },
         );
       })
       .catch((err) => {

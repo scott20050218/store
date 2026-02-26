@@ -99,14 +99,21 @@ Page({
       })
       .then((res) => {
         if (res.success) {
-          wx.showToast({ title: "出库成功", icon: "success" });
+          wx.showToast({
+            title: "出库成功",
+            icon: "success",
+            duration: 2000,
+          });
           this.setData({
             showQuantityModal: false,
             outboundItem: null,
             outboundQuantity: "",
           });
           this.loadList();
-          // wx.switchTab({ url: "/pages/index/index" });
+          // 等待5秒后跳转到首页
+          setTimeout(() => {
+            wx.switchTab({ url: "/pages/index/index" });
+          }, 1500);
         } else {
           wx.showToast({ title: res.message || "出库失败", icon: "none" });
         }

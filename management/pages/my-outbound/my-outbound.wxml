@@ -6,8 +6,10 @@
       <view class="detail-row" style="{{item.tag ? 'border-left: 6rpx solid ' + item.tag : 'border-left: 6rpx solid #f5222d'}}" wx:for="{{list}}" wx:key="id">
         <view class="detail-left">
           <text class="detail-item">{{item.itemType}}</text>
-          <text class="detail-meta">出库：{{item.outboundDate}}</text>
+          <text class="detail-meta">出库日期：{{item.outboundDate}}</text>
+          <text class="detail-meta" wx:if="{{item.createTime}}">操作时间：{{item.createTime}}</text>
           <text class="detail-meta" wx:if="{{item.location}}">货架：{{item.location}}</text>
+          <text class="detail-meta" wx:if="{{item.tag}}">标签：{{item.tag}}</text>
         </view>
         <view class="detail-right">
           <text class="detail-qty">{{item.quantity}} {{item.displayUnit}}</text>

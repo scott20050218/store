@@ -426,7 +426,7 @@ Page({
             wx.showToast({
               title: "入库成功",
               icon: "success",
-              duration: 1500,
+              duration: 2000,
             });
             api
               .getConfig()
@@ -454,7 +454,10 @@ Page({
               })
               .catch(() => {});
             setTimeout(() => this.resetForm(), 10000);
-            // wx.switchTab({ url: "/pages/index/index" });
+            // 等待5秒后跳转到首页
+            setTimeout(() => {
+              wx.switchTab({ url: "/pages/index/index" });
+            }, 1500);
           } else {
             wx.showToast({ title: res.message || "入库失败", icon: "none" });
           }
